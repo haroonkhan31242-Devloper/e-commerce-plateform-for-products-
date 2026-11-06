@@ -179,6 +179,14 @@ export interface TimelineEvent {
   actor: 'customer' | 'admin' | 'system';
 }
 
+// STEROSE's own parcel reference. A courier's number belongs in Order.trackingNumber.
+export interface ParcelLabel {
+  parcelId: string;
+  qrValue: string;
+  generatedAt: string;
+  printCount: number;
+}
+
 export interface Order {
   id: string; // e.g. "ORD-2026-8941"
   orderNumber: string;
@@ -198,6 +206,7 @@ export interface Order {
   rejectionReason?: string;
   trackingNumber?: string;
   courierName?: string;
+  parcelLabel?: ParcelLabel;
   timeline: TimelineEvent[];
 }
 

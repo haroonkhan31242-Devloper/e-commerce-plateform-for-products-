@@ -15,6 +15,7 @@ import { Order, OrderStatus } from '../../types/index.ts';
 import { useStore } from '../../context/StoreContext.tsx';
 import { StatusBadge } from '../../components/common/StatusBadge.tsx';
 import { Modal } from '../common/Overlay.tsx';
+import { ParcelLabelPanel } from './ParcelLabelPanel.tsx';
 import { FINAL_ORDER_STATUSES, PAYMENT_METHOD_LABELS } from '../../utils/orders.ts';
 
 interface OrderDetailModalProps {
@@ -307,6 +308,8 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order: liveO
               </p>
             </div>
           </div>
+
+          <ParcelLabelPanel key={order.id} order={order} />
 
           {/* Status Progression & Logistics Management */}
           <div className="p-5 bg-neutral-50 rounded-2xl border border-neutral-200 space-y-4">

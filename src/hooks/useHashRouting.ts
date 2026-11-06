@@ -32,6 +32,7 @@ export const useHashRouting = () => {
     setSelectedProductId,
     setSelectedCategorySlug,
     setSelectedSubcategory,
+    setScannedParcelId,
   } = useStore();
 
   const hasAppliedInitialRoute = useRef(false);
@@ -62,6 +63,7 @@ export const useHashRouting = () => {
       setCurrentView('products');
     } else if (section === 'admin') {
       if (first) setAdminTab(first as AdminTab);
+      if (first === 'orders' && second) setScannedParcelId(second);
       setCurrentView('admin');
     } else {
       setCurrentView(STATIC_ROUTES[section] ?? 'home');

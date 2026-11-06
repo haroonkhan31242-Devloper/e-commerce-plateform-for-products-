@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Menu, Plus } from 'lucide-react';
 import { useStore } from '../../context/StoreContext.tsx';
 import { BrandLogo } from '../../components/common/BrandLogo.tsx';
@@ -22,7 +22,16 @@ import { ShippingTab } from './tabs/ShippingTab.tsx';
 import { SettingsTab } from './tabs/SettingsTab.tsx';
 
 export const AdminDashboard: React.FC = () => {
-  const { adminTab, setAdminTab, isAdminAuthenticated, orders, storeSettings } = useStore();
+  const {
+    adminTab,
+    setAdminTab,
+    isAdminAuthenticated,
+    orders,
+    storeSettings,
+    scannedParcelId,
+    setScannedParcelId,
+    showToast,
+  } = useStore();
 
   // Mobile sidebar state
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -44,6 +53,17 @@ export const AdminDashboard: React.FC = () => {
   const [orderSearchQuery, setOrderSearchQuery] = useState('');
   const [productSearchQuery, setProductSearchQuery] = useState('');
   const [settingsForm, setSettingsForm] = useState(storeSettings);
+
+  // A scanned parcel QR code opens its order once the admin is signed in
+  useEffect(() => {
+    if (!isAdminAuthenticated || !scannedParcelId) return;
+    const scannedOrder = orders.find((o) => o.parcelLabel?.parcelId === scannedParcelId);
+    if (scannedOrder) setOrderIdToInspect(scannedOrder.id);
+    else showToast('error', `No order was found for parcel ${scannedParcelId}.`);
+    setScannedParcelId(null);
+    // The setters are recreated with the store but always write to the same state
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAdminAuthenticated, scannedParcelId]);
 
   if (!isAdminAuthenticated) {
     return <AdminLoginScreen />;

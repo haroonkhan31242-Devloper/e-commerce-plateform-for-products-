@@ -25,6 +25,7 @@ import { initialCoupons } from '../data/initialCoupons.ts';
 import { initialStoreSettings } from '../data/storeSettings.ts';
 import { usePersistedState } from '../hooks/usePersistedState.ts';
 import { useToastActions } from './ToastContext.tsx';
+import { canHaveParcelLabel, createParcelLabel } from '../utils/parcelLabel.ts';
 import {
   convertAmount,
   ExchangeRates,
@@ -120,6 +121,10 @@ interface StoreContextType {
   updateOrderStatus: (orderId: string, newStatus: OrderStatus, note?: string, courierName?: string, trackingNumber?: string) => void;
   updatePaymentStatus: (orderId: string, newStatus: PaymentStatus) => void;
   submitBankTransferReference: (orderId: string, reference: string) => void;
+  generateParcelLabel: (orderId: string) => void;
+  recordParcelLabelPrint: (orderId: string) => void;
+  scannedParcelId: string | null;
+  setScannedParcelId: (parcelId: string | null) => void;
 
   // Product CRUD (Admin)
   addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'reviews' | 'rating' | 'reviewCount'>) => Product;
@@ -194,6 +199,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
 
   // Authentication
+  const [scannedParcelId, setScannedParcelId] = useState<string | null>(null);
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
     return localStorage.getItem('aura_admin_logged') === 'true';
   });
@@ -531,6 +537,30 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     showToast('success', `Order status changed to "${newStatus}"`);
   };
 
+  // A label belongs to an order for good: reprints reuse it, so its QR code never changes
+  const generateParcelLabel = (orderId: string) => {
+    const order = orders.find((o) => o.id === orderId);
+    if (!order || !canHaveParcelLabel(order)) {
+      showToast('error', 'Accept this order before generating its parcel label.');
+      return;
+    }
+    if (order.parcelLabel) {
+      showToast('info', 'This order already has a parcel label.');
+      return;
+    }
+
+    const takenIds = new Set(orders.flatMap((o) => (o.parcelLabel ? [o.parcelLabel.parcelId] : [])));
+    const label = createParcelLabel(takenIds);
+    updateOrderById(orderId, (ord) => (ord.parcelLabel ? ord : { ...ord, parcelLabel: label }));
+    showToast('success', `Parcel label ${label.parcelId} generated.`);
+  };
+
+  const recordParcelLabelPrint = (orderId: string) => {
+    updateOrderById(orderId, (ord) =>
+      ord.parcelLabel ? { ...ord, parcelLabel: { ...ord.parcelLabel, printCount: ord.parcelLabel.printCount + 1 } } : ord
+    );
+  };
+
   const updatePaymentStatus = (orderId: string, newStatus: PaymentStatus) => {
     updateOrderById(orderId, (ord) => ({ ...ord, paymentStatus: newStatus }));
     showToast('success', `Payment status updated to "${newStatus}"`);
@@ -770,6 +800,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         updateOrderStatus,
         updatePaymentStatus,
         submitBankTransferReference,
+        generateParcelLabel,
+        recordParcelLabelPrint,
+        scannedParcelId,
+        setScannedParcelId,
         addProduct,
         updateProduct,
         deleteProduct,
