@@ -42,12 +42,13 @@ export type Currency =
   | 'QAR'
   | 'OMR';
 
-export type ToastType = 'success' | 'error' | 'info';
+export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
 export interface ToastState {
   id: number;
   type: ToastType;
   text: string;
+  repeat: number;
 }
 
 export interface Category {

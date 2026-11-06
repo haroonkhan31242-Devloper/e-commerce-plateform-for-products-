@@ -69,12 +69,9 @@ const AppContent: React.FC = () => {
 
   if (currentView === 'admin') {
     return (
-      <>
-        <Suspense fallback={<AdminLoader />}>
-          <AdminDashboard />
-        </Suspense>
-        <Toast />
-      </>
+      <Suspense fallback={<AdminLoader />}>
+        <AdminDashboard />
+      </Suspense>
     );
   }
 
@@ -109,7 +106,6 @@ const AppContent: React.FC = () => {
       <CartDrawer />
       <WishlistDrawer />
       <ProductQuickViewModal />
-      <Toast />
     </div>
   );
 };
@@ -122,6 +118,7 @@ export default function App() {
           <StoreProvider>
             <AppContent />
           </StoreProvider>
+          <Toast />
         </ToastProvider>
       </MotionConfig>
     </LazyMotion>

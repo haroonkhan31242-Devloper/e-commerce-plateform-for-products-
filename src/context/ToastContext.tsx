@@ -1,11 +1,9 @@
 import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { ToastState, ToastType } from '../types/index.ts';
 
-const TOAST_DURATION_MS = 4000;
-
 interface ToastActions {
   showToast: (type: ToastType, text: string) => void;
-  dismissToast: () => void;
+  dismissToast: (id: number) => void;
 }
 
 const ToastActionsContext = createContext<ToastActions | undefined>(undefined);
@@ -16,15 +14,19 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [toast, setToast] = useState<ToastState | null>(null);
   const nextId = useRef(0);
 
+  // One message shows at a time: a repeat extends it, anything else replaces it
   const showToast = useCallback((type: ToastType, text: string) => {
     const id = ++nextId.current;
-    setToast({ id, type, text });
-    setTimeout(() => {
-      setToast((current) => (current?.id === id ? null : current));
-    }, TOAST_DURATION_MS);
+    setToast((current) =>
+      current?.type === type && current.text === text
+        ? { ...current, repeat: current.repeat + 1 }
+        : { id, type, text, repeat: 0 }
+    );
   }, []);
 
-  const dismissToast = useCallback(() => setToast(null), []);
+  const dismissToast = useCallback((id: number) => {
+    setToast((current) => (current?.id === id ? null : current));
+  }, []);
   const actions = useMemo(() => ({ showToast, dismissToast }), [showToast, dismissToast]);
 
   return (
