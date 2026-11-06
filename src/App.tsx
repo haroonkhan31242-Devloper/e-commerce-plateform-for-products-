@@ -9,7 +9,6 @@ import { Footer } from './components/common/Footer.tsx';
 import { Toast } from './components/common/Toast.tsx';
 import { CartDrawer } from './components/customer/CartDrawer.tsx';
 import { WishlistDrawer } from './components/customer/WishlistDrawer.tsx';
-import { VisualSearchModal } from './components/customer/VisualSearchModal.tsx';
 import { ProductQuickViewModal } from './components/customer/ProductQuickViewModal.tsx';
 
 // Customer Pages
@@ -109,7 +108,6 @@ const AppContent: React.FC = () => {
       {/* Global Modals & Drawers */}
       <CartDrawer />
       <WishlistDrawer />
-      <VisualSearchModal />
       <ProductQuickViewModal />
       <Toast />
     </div>

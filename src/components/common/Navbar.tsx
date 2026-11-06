@@ -7,7 +7,6 @@ import {
   User,
   Menu,
   X,
-  Camera,
   ShieldCheck,
   ChevronDown,
   Sparkles,
@@ -15,6 +14,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext.tsx';
+import { BrandLogo } from './BrandLogo.tsx';
 import { CurrencySelector } from './CurrencySelector.tsx';
 
 const CountBadge: React.FC<{ count: number; className: string }> = ({ count, className }) => (
@@ -36,7 +36,6 @@ export const Navbar: React.FC = () => {
     wishlist,
     setIsCartDrawerOpen,
     setIsWishlistDrawerOpen,
-    setIsVisualSearchModalOpen,
     currentView,
     setCurrentView,
     searchQuery,
@@ -152,19 +151,22 @@ export const Navbar: React.FC = () => {
             {/* Brand Logo */}
             <button
               onClick={closeMenusAnd(() => setCurrentView('home'))}
-              className="flex flex-col items-start select-none group min-w-0"
+              className="flex items-center gap-2 sm:gap-3 select-none group min-w-0"
               aria-label="STEROSE home"
             >
-              <span className="font-serif text-lg min-[380px]:text-xl sm:text-3xl font-bold tracking-wider sm:tracking-widest text-neutral-900 group-hover:text-amber-800 whitespace-nowrap">
-                STEROSE
-              </span>
-              <span className="hidden sm:block text-xs tracking-widest text-neutral-600 uppercase font-medium">
-                Fine Living, Fashion & Healthcare
+              <BrandLogo className="w-7 h-7 min-[380px]:w-8 min-[380px]:h-8 sm:w-10 sm:h-10" />
+              <span className="flex flex-col items-start min-w-0">
+                <span className="font-serif text-lg min-[380px]:text-xl sm:text-3xl md:text-2xl lg:text-3xl font-bold tracking-wider sm:tracking-widest text-neutral-900 group-hover:text-amber-800 whitespace-nowrap">
+                  STEROSE
+                </span>
+                <span className="text-[9px] min-[380px]:text-[10px] sm:text-xs leading-none tracking-wide sm:tracking-widest text-brand-gold uppercase font-semibold whitespace-nowrap">
+                  Your World Store
+                </span>
               </span>
             </button>
           </div>
 
-          {/* Search Bar with AI Visual Search */}
+          {/* Search Bar */}
           <form
             role="search"
             onSubmit={handleSearchSubmit}
@@ -180,32 +182,14 @@ export const Navbar: React.FC = () => {
                 placeholder="Search dresses, jewelry, skincare..."
                 value={localSearch}
                 onChange={(e) => setLocalSearch(e.target.value)}
-                className="w-full pl-10 pr-28 py-2.5 rounded-full border border-neutral-300 bg-neutral-50 text-sm focus:bg-white focus:outline-none focus:border-neutral-900"
+                className="w-full pl-10 pr-4 py-2.5 rounded-full border border-neutral-300 bg-neutral-50 text-sm focus:bg-white focus:outline-none focus:border-neutral-900"
               />
               <Search className="w-4 h-4 text-neutral-500 absolute left-3.5 top-1/2 -translate-y-1/2" aria-hidden="true" />
-
-              <button
-                type="button"
-                onClick={() => setIsVisualSearchModalOpen(true)}
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-amber-900 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-full"
-                title="Search with a photo"
-              >
-                <Camera className="w-3.5 h-3.5 text-amber-700" aria-hidden="true" />
-                <span>Photo Search</span>
-              </button>
             </div>
           </form>
 
           {/* Right Action Icons */}
           <div className="flex items-center gap-0.5 sm:gap-3 shrink-0">
-            <button
-              onClick={() => setIsVisualSearchModalOpen(true)}
-              className="hidden min-[380px]:block md:hidden p-2 text-neutral-700 hover:text-neutral-900 rounded-full hover:bg-neutral-100"
-              aria-label="Search with a photo"
-            >
-              <Camera className="w-5 h-5" aria-hidden="true" />
-            </button>
-
             {/* Customer User Account */}
             <div className="relative" ref={userMenuRef}>
               <button
@@ -440,12 +424,6 @@ export const Navbar: React.FC = () => {
           </nav>
 
           <div className="pt-3 border-t border-neutral-200 space-y-0.5">
-            <button
-              onClick={closeMenusAnd(() => setIsVisualSearchModalOpen(true))}
-              className="w-full text-left px-3 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-100 rounded-lg"
-            >
-              Search by Photo
-            </button>
             <button
               onClick={closeMenusAnd(() => setCurrentView('order-tracking'))}
               className="w-full text-left px-3 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-100 rounded-lg"

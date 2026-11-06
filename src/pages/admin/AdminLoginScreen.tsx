@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Loader2, ShieldCheck } from 'lucide-react';
 import { useStore } from '../../context/StoreContext.tsx';
+import { BrandLogo } from '../../components/common/BrandLogo.tsx';
 
 export const AdminLoginScreen: React.FC = () => {
   const { adminLogin, setCurrentView, showToast } = useStore();
@@ -27,9 +28,7 @@ export const AdminLoginScreen: React.FC = () => {
     <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-neutral-900 border border-neutral-800 rounded-3xl p-8 shadow-2xl space-y-6">
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 rounded-2xl bg-amber-500 text-neutral-950 mx-auto flex items-center justify-center font-bold font-serif text-2xl shadow-lg">
-            S
-          </div>
+          <BrandLogo onDark className="w-16 h-16 shadow-lg" />
           <h1 className="font-serif text-2xl font-bold tracking-wider text-white">
             STEROSE ADMIN
           </h1>

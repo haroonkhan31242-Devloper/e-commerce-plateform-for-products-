@@ -11,6 +11,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext.tsx';
+import { BrandLogo } from './BrandLogo.tsx';
 import { subscribeToNewsletter } from '../../services/storeApi.ts';
 import { isValidEmail } from '../../utils/validation.ts';
 
@@ -101,6 +102,7 @@ export const Footer: React.FC = () => {
           {/* Brand Info */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-2">
+              <BrandLogo onDark className="w-9 h-9" />
               <span className="font-serif text-2xl font-bold tracking-widest text-white">
                 STEROSE
               </span>

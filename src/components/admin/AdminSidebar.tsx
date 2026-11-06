@@ -15,6 +15,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext.tsx';
+import { BrandLogo } from '../common/BrandLogo.tsx';
 import { AdminTab } from '../../types/index.ts';
 
 interface AdminSidebarProps {
@@ -80,9 +81,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         {/* Brand Header */}
         <div className="p-6 border-b border-neutral-800">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-amber-500 text-neutral-950 flex items-center justify-center font-bold font-serif text-lg">
-              S
-            </div>
+            <BrandLogo onDark className="w-9 h-9" />
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="font-serif text-base font-bold text-white tracking-wider">

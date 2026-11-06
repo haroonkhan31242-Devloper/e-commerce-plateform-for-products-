@@ -2,15 +2,14 @@
 
 Single-vendor, multi-category e-commerce storefront with an admin portal, built with React, TypeScript, Vite and Tailwind CSS.
 
-Store data lives in `src/data` and is persisted to the browser's `localStorage`. `server.ts` serves the app and keeps the Gemini API key off the client for Visual Search; without a key, it uses built-in fallback results. Prices are stored in the base currency set in `src/data/storeSettings.ts` and converted for display by `src/services/currencyService.ts`, which uses demo exchange rates until a live rates API is connected.
+Store data lives in `src/data` and is persisted to the browser's `localStorage`. `server.ts` serves the app. Prices are stored in the base currency set in `src/data/storeSettings.ts` and converted for display by `src/services/currencyService.ts`, which uses demo exchange rates until a live rates API is connected.
 
 ## Run locally
 
 **Prerequisites:** Node.js
 
 1. Install dependencies: `npm install`
-2. Optional: set `GEMINI_API_KEY` in `.env` (see `.env.example`)
-3. Start the app: `npm run dev`
+2. Start the app: `npm run dev`
 
 ## Scripts
 
@@ -22,7 +21,8 @@ Store data lives in `src/data` and is persisted to the browser's `localStorage`.
 ## Project structure
 
 ```
-server.ts          Dev/static server and Gemini proxy
+server.ts          Dev/static server
+public/            Official STEROSE logo, also used as the favicon
 src/
   components/      admin, customer and shared (common) UI
   context/         StoreContext: app state and store actions

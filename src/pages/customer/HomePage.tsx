@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AnimatePresence, m } from 'motion/react';
-import { Sparkles, ArrowRight, Camera, ChevronRight, Tag, Check } from 'lucide-react';
+import { Sparkles, ArrowRight, ChevronRight, Tag, Check } from 'lucide-react';
 import { useStore } from '../../context/StoreContext.tsx';
 import { ProductCard } from '../../components/customer/ProductCard.tsx';
 import { StarRating } from '../../components/common/StarRating.tsx';
@@ -49,7 +49,6 @@ export const HomePage: React.FC = () => {
     navigateToCategory,
     browseAllProducts,
     formatPrice,
-    setIsVisualSearchModalOpen,
     showToast,
   } = useStore();
 
@@ -120,14 +119,6 @@ export const HomePage: React.FC = () => {
                 <span>{currentHero.ctaText}</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
-
-              <button
-                onClick={() => setIsVisualSearchModalOpen(true)}
-                className="px-6 py-3.5 bg-neutral-900/80 hover:bg-neutral-800 text-white border border-neutral-700 text-xs font-semibold tracking-wider uppercase rounded-xl flex items-center gap-2"
-              >
-                <Camera className="w-4 h-4 text-amber-400" />
-                <span>Search by Photo</span>
-              </button>
             </div>
           </div>
         </div>
@@ -190,54 +181,6 @@ export const HomePage: React.FC = () => {
               </p>
             </button>
           ))}
-        </div>
-      </Reveal>
-
-      {/* Gemini AI Visual Match Banner Callout */}
-      <Reveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative rounded-3xl bg-neutral-900 text-white p-6 sm:p-12 overflow-hidden border border-neutral-800">
-          <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-full text-xs font-semibold">
-                <Camera className="w-3.5 h-3.5" />
-                <span>AI Visual Search</span>
-              </div>
-              <h2 className="font-serif text-2xl sm:text-4xl font-bold text-white leading-tight">
-                Snap or Upload a Photo to Find Matching Styles
-              </h2>
-              <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed font-light">
-                Seen a luxury evening gown, vintage jewelry setting, skincare serum, or health device elsewhere? Upload the image and we will identify its style, shade, and features, then suggest close matches from our catalog.
-              </p>
-              <button
-                onClick={() => setIsVisualSearchModalOpen(true)}
-                className="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center gap-2"
-              >
-                <Camera className="w-4 h-4" />
-                <span>Try Photo Search</span>
-              </button>
-            </div>
-
-            <div className="flex justify-center">
-              <div className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-2xl overflow-hidden border-2 border-white/20 group">
-                <img
-                  src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=800&q=80"
-                  alt="Gold jewelry being identified by photo search"
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-neutral-950/80 to-transparent flex flex-col justify-end p-4 text-white">
-                  <div className="flex items-center gap-2 text-xs font-bold text-amber-300 mb-1">
-                    <Sparkles className="w-4 h-4" />
-                    <span>Visual Recognition</span>
-                  </div>
-                  <p className="text-xs text-neutral-200">
-                    &quot;18K Gold Vermeil &bull; Emerald Cut Lab Gem &bull; 925 Silver Base&quot;
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </Reveal>
 

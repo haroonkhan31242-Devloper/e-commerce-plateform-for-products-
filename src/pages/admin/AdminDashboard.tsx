@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Menu, Plus } from 'lucide-react';
 import { useStore } from '../../context/StoreContext.tsx';
+import { BrandLogo } from '../../components/common/BrandLogo.tsx';
 import { AdminSidebar } from '../../components/admin/AdminSidebar.tsx';
 import { ProductFormModal } from '../../components/admin/ProductFormModal.tsx';
 import { CategoryFormModal } from '../../components/admin/CategoryFormModal.tsx';
@@ -89,6 +90,7 @@ export const AdminDashboard: React.FC = () => {
             >
               <Menu className="w-5 h-5" />
             </button>
+            <BrandLogo className="w-7 h-7 lg:hidden" />
             <div>
               <h1 className="font-serif text-lg sm:text-xl font-bold text-neutral-900 capitalize">
                 {adminTab.replace('-', ' ')}

@@ -91,8 +91,6 @@ interface StoreContextType {
   setIsCartDrawerOpen: (open: boolean) => void;
   isWishlistDrawerOpen: boolean;
   setIsWishlistDrawerOpen: (open: boolean) => void;
-  isVisualSearchModalOpen: boolean;
-  setIsVisualSearchModalOpen: (open: boolean) => void;
   quickViewProduct: Product | null;
   openQuickView: (product: Product) => void;
   closeQuickView: () => void;
@@ -187,7 +185,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // UI state
   const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
   const [isWishlistDrawerOpen, setIsWishlistDrawerOpen] = useState(false);
-  const [isVisualSearchModalOpen, setIsVisualSearchModalOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
 
   // Currency & Coupon
@@ -748,8 +745,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setIsCartDrawerOpen,
         isWishlistDrawerOpen,
         setIsWishlistDrawerOpen,
-        isVisualSearchModalOpen,
-        setIsVisualSearchModalOpen,
         quickViewProduct,
         openQuickView,
         closeQuickView,

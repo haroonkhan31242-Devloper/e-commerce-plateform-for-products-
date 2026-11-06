@@ -29,6 +29,9 @@
   --color-amber-900: #4f3b1c;
   --color-amber-950: #2e210e;
 
+  /* Sampled from the bottom-right shape of the official logo */
+  --color-brand-gold: #c9a226;
+
   --radius-lg: 0.5rem;
   --radius-xl: 0.625rem;
   --radius-2xl: 0.875rem;
