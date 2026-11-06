@@ -81,7 +81,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         {/* Brand Header */}
         <div className="p-6 border-b border-neutral-800">
           <div className="flex items-center gap-2.5">
-            <BrandLogo onDark className="h-11" />
+            <BrandLogo className="h-11" />
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="font-serif text-base font-bold text-white tracking-wider">
