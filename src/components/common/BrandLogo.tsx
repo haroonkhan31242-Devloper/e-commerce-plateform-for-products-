@@ -1,15 +1,13 @@
 import React from 'react';
 
-// logo.webp stacks the bag above the name. The name is set as text beside the logo so it
-// stays readable at small sizes, so only the bag area of the file is shown here.
-export const BrandLogo: React.FC<{ className?: string }> = ({ className = 'h-8' }) => (
-  <span className={`relative inline-block shrink-0 overflow-hidden aspect-[763/1017] ${className}`}>
-    <img
-      src="/logo.webp"
-      alt=""
-      width={2000}
-      height={1994}
-      className="absolute max-w-none h-auto w-[262.1%] left-[-80.9%] top-[-5.5%]"
-    />
+interface BrandLogoProps {
+  className?: string;
+  onDark?: boolean;
+}
+
+// logo.png has a white background, so dark surfaces show it on a matching white tile
+export const BrandLogo: React.FC<BrandLogoProps> = ({ className = 'h-8', onDark = false }) => (
+  <span className={`inline-flex shrink-0 ${onDark ? 'bg-white rounded-lg p-1' : ''} ${className}`}>
+    <img src="/logo.png" alt="" width={268} height={349} className="h-full w-auto" />
   </span>
 );

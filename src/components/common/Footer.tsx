@@ -102,7 +102,7 @@ export const Footer: React.FC = () => {
           {/* Brand Info */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <BrandLogo className="h-11" />
+              <BrandLogo onDark className="h-12" />
               <span className="font-serif text-2xl font-bold tracking-widest text-white">
                 STEROSE
               </span>

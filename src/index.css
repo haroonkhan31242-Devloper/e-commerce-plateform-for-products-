@@ -29,8 +29,8 @@
   --color-amber-900: #4f3b1c;
   --color-amber-950: #2e210e;
 
-  /* Sampled from the "ONLINE STORE" line of the official logo */
-  --color-brand-pink: #be185e;
+  /* The deep end of the official logo gradient, the most readable shade on white */
+  --color-brand-gold: #b08819;
 
   --radius-lg: 0.5rem;
   --radius-xl: 0.625rem;
