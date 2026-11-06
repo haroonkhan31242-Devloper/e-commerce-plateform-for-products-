@@ -154,12 +154,12 @@ export const Navbar: React.FC = () => {
               className="flex items-center gap-2 sm:gap-3 select-none group min-w-0"
               aria-label="STEROSE home"
             >
-              <BrandLogo className="w-7 h-7 min-[380px]:w-8 min-[380px]:h-8 sm:w-10 sm:h-10" />
+              <BrandLogo className="h-9 sm:h-11" />
               <span className="flex flex-col items-start min-w-0">
                 <span className="font-serif text-lg min-[380px]:text-xl sm:text-3xl md:text-2xl lg:text-3xl font-bold tracking-wider sm:tracking-widest text-neutral-900 group-hover:text-amber-800 whitespace-nowrap">
                   STEROSE
                 </span>
-                <span className="text-[9px] min-[380px]:text-[10px] sm:text-xs leading-none tracking-wide sm:tracking-widest text-brand-gold uppercase font-semibold whitespace-nowrap">
+                <span className="text-[9px] min-[380px]:text-[10px] sm:text-xs leading-none tracking-wide sm:tracking-widest text-brand-pink uppercase font-semibold whitespace-nowrap">
                   Your World Store
                 </span>
               </span>

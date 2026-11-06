@@ -28,7 +28,7 @@ export const AdminLoginScreen: React.FC = () => {
     <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-neutral-900 border border-neutral-800 rounded-3xl p-8 shadow-2xl space-y-6">
         <div className="text-center space-y-2">
-          <BrandLogo onDark className="w-16 h-16 shadow-lg" />
+          <BrandLogo className="h-16" />
           <h1 className="font-serif text-2xl font-bold tracking-wider text-white">
             STEROSE ADMIN
           </h1>

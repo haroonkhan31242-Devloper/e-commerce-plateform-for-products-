@@ -101,12 +101,12 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
           {/* Brand Info */}
           <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center gap-2">
-              <BrandLogo onDark className="w-9 h-9" />
+            <div className="flex items-center gap-3">
+              <BrandLogo className="h-11" />
               <span className="font-serif text-2xl font-bold tracking-widest text-white">
                 STEROSE
               </span>
-                          </div>
+            </div>
             <p className="text-xs text-neutral-400 leading-relaxed max-w-sm">
               Healthcare essentials, ladies and gents fashion, organic baby wear, botanical cosmetics, and handcrafted jewelry, all from one trusted store.
             </p>

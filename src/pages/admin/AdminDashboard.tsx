@@ -90,7 +90,7 @@ export const AdminDashboard: React.FC = () => {
             >
               <Menu className="w-5 h-5" />
             </button>
-            <BrandLogo className="w-7 h-7 lg:hidden" />
+            <BrandLogo className="h-9 lg:hidden" />
             <div>
               <h1 className="font-serif text-lg sm:text-xl font-bold text-neutral-900 capitalize">
                 {adminTab.replace('-', ' ')}
