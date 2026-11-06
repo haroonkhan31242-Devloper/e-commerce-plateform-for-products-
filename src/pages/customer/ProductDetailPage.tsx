@@ -167,7 +167,7 @@ export const ProductDetailPage: React.FC = () => {
       {/* Main Product Showcase */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
         {/* Left: Product Images Gallery */}
-        <div className="space-y-4 lg:sticky lg:top-44">
+        <div className="space-y-4 lg:sticky lg:top-32">
           <div className="aspect-square w-full rounded-3xl overflow-hidden bg-white border border-neutral-200/80 shadow-xs relative group">
             <img
               key={activeImageIndex}

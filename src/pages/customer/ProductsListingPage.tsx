@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { SlidersHorizontal, X, Search, Filter, ArrowUpDown } from 'lucide-react';
 import { useStore } from '../../context/StoreContext.tsx';
 import { ProductCard } from '../../components/customer/ProductCard.tsx';
 import { EmptyState } from '../../components/common/EmptyState.tsx';
+import { Drawer } from '../../components/common/Overlay.tsx';
 import { getEffectivePrice, isOnSale } from '../../utils/product.ts';
 
 type SortOption = 'featured' | 'price-asc' | 'price-desc' | 'rating' | 'newest' | 'discount';
@@ -26,6 +27,16 @@ export const ProductsListingPage: React.FC = () => {
   const [inStockOnly, setInStockOnly] = useState(false);
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+
+  // From the md breakpoint the sidebar is on screen, so the drawer has no purpose
+  useEffect(() => {
+    const sidebarQuery = window.matchMedia('(min-width: 768px)');
+    const closeDrawer = () => {
+      if (sidebarQuery.matches) setIsMobileFiltersOpen(false);
+    };
+    sidebarQuery.addEventListener('change', closeDrawer);
+    return () => sidebarQuery.removeEventListener('change', closeDrawer);
+  }, []);
 
   const activeCategories = categories.filter((c) => c.isActive);
   const activeProducts = useMemo(() => products.filter((p) => p.status === 'active'), [products]);
@@ -139,6 +150,110 @@ export const ProductsListingPage: React.FC = () => {
     onSaleOnly ||
     priceLimit < priceCeiling;
 
+  const selectCategory = (slug: string | null) => {
+    setSelectedCategorySlug(slug);
+    setSelectedSubcategory(null);
+    setIsMobileFiltersOpen(false);
+  };
+
+  // Shared by the sidebar and the small-screen drawer; the drawer gets touch-sized rows
+  const renderFilterSections = (inDrawer: boolean) => {
+    const categoryRowSize = inDrawer ? 'px-3 py-3 text-sm' : 'px-2.5 py-1.5 text-xs';
+    const toggleRowSize = inDrawer ? 'py-2 text-sm' : 'text-xs';
+
+    return (
+      <>
+        {/* Department Categories */}
+        <div>
+          <h4 className="text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2.5">
+            Categories
+          </h4>
+          <div className="space-y-1">
+            <button
+              onClick={() => selectCategory(null)}
+              className={`w-full text-left ${categoryRowSize} rounded-lg transition-colors flex items-center justify-between ${
+                !selectedCategorySlug
+                  ? 'bg-neutral-900 text-white font-semibold'
+                  : 'text-neutral-700 hover:bg-neutral-100'
+              }`}
+            >
+              <span>All Categories</span>
+              <span className="text-[11px] opacity-70">{activeProducts.length}</span>
+            </button>
+
+            {activeCategories.map((c) => {
+              const count = activeProducts.filter((p) => p.categoryId === c.id).length;
+              const isSelected = selectedCategorySlug === c.slug;
+              return (
+                <button
+                  key={c.id}
+                  onClick={() => selectCategory(c.slug)}
+                  className={`w-full text-left ${categoryRowSize} rounded-lg transition-colors flex items-center justify-between ${
+                    isSelected
+                      ? 'bg-neutral-900 text-white font-semibold'
+                      : 'text-neutral-700 hover:bg-neutral-100'
+                  }`}
+                >
+                  <span>{c.name}</span>
+                  <span className="text-[11px] opacity-70">{count}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Price Range Slider */}
+        <div className="pt-4 border-t border-neutral-100">
+          <div className="flex items-center justify-between text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2">
+            <span>Max Price</span>
+            <span className="text-amber-900 font-mono">{formatPrice(priceLimit)}</span>
+          </div>
+          <input
+            type="range"
+            aria-label="Maximum price"
+            min="0"
+            max={priceCeiling}
+            step="10"
+            value={priceLimit}
+            onChange={(e) => setMaxPrice(Number(e.target.value))}
+            className="w-full accent-neutral-900 cursor-pointer"
+          />
+          <div className="flex justify-between text-[11px] text-neutral-500 mt-1">
+            <span>{formatPrice(0)}</span>
+            <span>{formatPrice(priceCeiling)}</span>
+          </div>
+        </div>
+
+        {/* Checkbox Toggles */}
+        <div className="pt-4 border-t border-neutral-100 space-y-3">
+          <h4 className="text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
+            Availability & Deals
+          </h4>
+
+          <label className={`flex items-center gap-2.5 text-neutral-700 cursor-pointer select-none ${toggleRowSize}`}>
+            <input
+              type="checkbox"
+              checked={inStockOnly}
+              onChange={(e) => setInStockOnly(e.target.checked)}
+              className="w-4 h-4 rounded border-neutral-300 text-neutral-900 focus:ring-neutral-900"
+            />
+            <span>In stock only</span>
+          </label>
+
+          <label className={`flex items-center gap-2.5 text-neutral-700 cursor-pointer select-none ${toggleRowSize}`}>
+            <input
+              type="checkbox"
+              checked={onSaleOnly}
+              onChange={(e) => setOnSaleOnly(e.target.checked)}
+              className="w-4 h-4 rounded border-neutral-300 text-neutral-900 focus:ring-neutral-900"
+            />
+            <span>On sale</span>
+          </label>
+        </div>
+      </>
+    );
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6 sm:space-y-8">
       {/* Page Header */}
@@ -179,7 +294,7 @@ export const ProductsListingPage: React.FC = () => {
         </div>
 
         {/* Search query tag & Reset button */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 md:shrink-0">
           {hasActiveFilters && (
             <button
               onClick={resetAllFilters}
@@ -210,19 +325,20 @@ export const ProductsListingPage: React.FC = () => {
 
           {/* Mobile Filter Toggle */}
           <button
-            onClick={() => setIsMobileFiltersOpen(!isMobileFiltersOpen)}
+            onClick={() => setIsMobileFiltersOpen(true)}
+            aria-haspopup="dialog"
             aria-expanded={isMobileFiltersOpen}
             className="md:hidden flex items-center gap-1.5 px-3 py-2 bg-neutral-900 text-white rounded-xl text-xs font-semibold"
           >
-            <Filter className="w-3.5 h-3.5" />
-            <span>Filters</span>
+            <Filter className="w-3.5 h-3.5" aria-hidden="true" />
+            <span>Categories &amp; Filters</span>
           </button>
         </div>
       </div>
 
       {/* Subcategory Pills (Horizontal bar for quick selection) */}
       {availableSubcategories.length > 0 && (
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 md:flex-wrap">
           <button
             onClick={() => setSelectedSubcategory(null)}
             className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
@@ -272,9 +388,8 @@ export const ProductsListingPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-[15rem_1fr] lg:grid-cols-4 gap-6 lg:gap-8">
         {/* Desktop Sidebar Filters */}
         <aside
-          className={`space-y-6 ${
-            isMobileFiltersOpen ? 'block' : 'hidden md:block'
-          } p-5 bg-white rounded-2xl border border-neutral-200 h-fit md:sticky md:top-44 md:max-h-[calc(100dvh-12rem)] md:overflow-y-auto`}
+          aria-label="Categories and filters"
+          className="hidden md:block space-y-6 p-5 bg-white rounded-2xl border border-neutral-200 h-fit md:sticky md:top-32 md:max-h-[calc(100dvh-9rem)] md:overflow-y-auto"
         >
           <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
             <h3 className="font-serif text-sm font-bold text-neutral-900 flex items-center gap-2">
@@ -291,99 +406,7 @@ export const ProductsListingPage: React.FC = () => {
             )}
           </div>
 
-          {/* Department Categories */}
-          <div>
-            <h4 className="text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2.5">
-              Categories
-            </h4>
-            <div className="space-y-1">
-              <button
-                onClick={() => {
-                  setSelectedCategorySlug(null);
-                  setSelectedSubcategory(null);
-                }}
-                className={`w-full text-left px-2.5 py-1.5 text-xs rounded-lg transition-colors flex items-center justify-between ${
-                  !selectedCategorySlug
-                    ? 'bg-neutral-900 text-white font-semibold'
-                    : 'text-neutral-700 hover:bg-neutral-100'
-                }`}
-              >
-                <span>All Categories</span>
-                <span className="text-[11px] opacity-70">{activeProducts.length}</span>
-              </button>
-
-              {activeCategories.map((c) => {
-                const count = activeProducts.filter((p) => p.categoryId === c.id).length;
-                const isSelected = selectedCategorySlug === c.slug;
-                return (
-                  <button
-                    key={c.id}
-                    onClick={() => {
-                      setSelectedCategorySlug(c.slug);
-                      setSelectedSubcategory(null);
-                    }}
-                    className={`w-full text-left px-2.5 py-1.5 text-xs rounded-lg transition-colors flex items-center justify-between ${
-                      isSelected
-                        ? 'bg-neutral-900 text-white font-semibold'
-                        : 'text-neutral-700 hover:bg-neutral-100'
-                    }`}
-                  >
-                    <span>{c.name}</span>
-                    <span className="text-[11px] opacity-70">{count}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Price Range Slider */}
-          <div className="pt-4 border-t border-neutral-100">
-            <div className="flex items-center justify-between text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2">
-              <span>Max Price</span>
-              <span className="text-amber-900 font-mono">{formatPrice(priceLimit)}</span>
-            </div>
-            <input
-              type="range"
-              aria-label="Maximum price"
-              min="0"
-              max={priceCeiling}
-              step="10"
-              value={priceLimit}
-              onChange={(e) => setMaxPrice(Number(e.target.value))}
-              className="w-full accent-neutral-900 cursor-pointer"
-            />
-            <div className="flex justify-between text-[11px] text-neutral-500 mt-1">
-              <span>{formatPrice(0)}</span>
-              <span>{formatPrice(priceCeiling)}</span>
-            </div>
-          </div>
-
-          {/* Checkbox Toggles */}
-          <div className="pt-4 border-t border-neutral-100 space-y-3">
-            <h4 className="text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
-              Availability & Deals
-            </h4>
-
-            <label className="flex items-center gap-2.5 text-xs text-neutral-700 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={inStockOnly}
-                onChange={(e) => setInStockOnly(e.target.checked)}
-                className="w-4 h-4 rounded border-neutral-300 text-neutral-900 focus:ring-neutral-900"
-              />
-              <span>In stock only</span>
-            </label>
-
-            <label className="flex items-center gap-2.5 text-xs text-neutral-700 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={onSaleOnly}
-                onChange={(e) => setOnSaleOnly(e.target.checked)}
-                className="w-4 h-4 rounded border-neutral-300 text-neutral-900 focus:ring-neutral-900"
-              />
-              <span>On sale</span>
-            </label>
-          </div>
+          {renderFilterSections(false)}
         </aside>
 
         {/* Products Grid Area */}
@@ -417,6 +440,48 @@ export const ProductsListingPage: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Small-screen home of the sidebar */}
+      <Drawer
+        isOpen={isMobileFiltersOpen}
+        onClose={() => setIsMobileFiltersOpen(false)}
+        label="Categories and filters"
+      >
+        <div className="flex items-center justify-between px-5 py-3 border-b border-neutral-200">
+          <h2 className="font-serif text-lg font-bold text-neutral-900 flex items-center gap-2">
+            <SlidersHorizontal className="w-4 h-4 text-neutral-700" aria-hidden="true" />
+            <span>Categories &amp; Filters</span>
+          </h2>
+          <button
+            onClick={() => setIsMobileFiltersOpen(false)}
+            aria-label="Close categories and filters"
+            className="p-2.5 -mr-2.5 text-neutral-600 hover:text-neutral-900 rounded-full hover:bg-neutral-100"
+          >
+            <X className="w-5 h-5" aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto overscroll-contain p-5 space-y-6">
+          {renderFilterSections(true)}
+        </div>
+
+        <div className="flex items-center gap-3 px-5 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t border-neutral-200">
+          {hasActiveFilters && (
+            <button
+              onClick={resetAllFilters}
+              className="px-4 py-3 text-sm font-semibold text-rose-700 rounded-xl hover:bg-rose-50"
+            >
+              Clear
+            </button>
+          )}
+          <button
+            onClick={() => setIsMobileFiltersOpen(false)}
+            className="flex-1 px-4 py-3 bg-neutral-900 text-white text-sm font-semibold rounded-xl hover:bg-neutral-800"
+          >
+            Show {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
+          </button>
+        </div>
+      </Drawer>
     </div>
   );
 };

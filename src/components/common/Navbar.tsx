@@ -31,17 +31,12 @@ const CountBadge: React.FC<{ count: number; className: string }> = ({ count, cla
 
 export const Navbar: React.FC = () => {
   const {
-    categories,
     cartItemCount,
     wishlist,
     setIsCartDrawerOpen,
     setIsWishlistDrawerOpen,
-    currentView,
     setCurrentView,
     searchQuery,
-    selectedCategorySlug,
-    saleOnly,
-    navigateToCategory,
     browseAllProducts,
     browseOffers,
     searchProducts,
@@ -52,7 +47,6 @@ export const Navbar: React.FC = () => {
   } = useStore();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [expandedCategoryId, setExpandedCategoryId] = useState<string | null>(null);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [localSearch, setLocalSearch] = useState(searchQuery);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -91,18 +85,10 @@ export const Navbar: React.FC = () => {
     setIsMobileMenuOpen(false);
   };
 
-  const activeCategories = categories.filter((c) => c.isActive);
   const announcementText = storeSettings.announcementText.replace(
     '{freeShipping}',
     formatPrice(storeSettings.freeShippingThreshold)
   );
-  const isAllProductsActive =
-    currentView === 'products' && !selectedCategorySlug && !saleOnly && !searchQuery;
-
-  const navLinkClasses = (isActive: boolean) =>
-    `relative py-1 whitespace-nowrap hover:text-amber-800 after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:bg-amber-700 after:origin-left after:transition-transform after:duration-300 ${
-      isActive ? 'text-amber-800 after:scale-x-100' : 'after:scale-x-0 hover:after:scale-x-100'
-    }`;
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-neutral-200">
@@ -288,63 +274,6 @@ export const Navbar: React.FC = () => {
             </button>
           </div>
         </div>
-
-        {/* Category Navigation Bar (Desktop) */}
-        <nav
-          aria-label="Product categories"
-          className="hidden lg:flex items-start justify-between gap-6 border-t border-neutral-100 py-2.5 text-xs tracking-wider uppercase font-semibold text-neutral-700"
-        >
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
-            <button onClick={browseAllProducts} className={navLinkClasses(isAllProductsActive)}>
-              All Products
-            </button>
-
-            {activeCategories.map((category) => (
-              <div key={category.id} className="relative group">
-                <button
-                  onClick={() => navigateToCategory(category.slug)}
-                  className={`flex items-center gap-1 ${navLinkClasses(
-                    currentView === 'products' && selectedCategorySlug === category.slug
-                  )}`}
-                >
-                  <span>{category.name}</span>
-                  {category.subcategories.length > 0 && (
-                    <ChevronDown
-                      className="w-3 h-3 text-neutral-500 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180"
-                      aria-hidden="true"
-                    />
-                  )}
-                </button>
-
-                {category.subcategories.length > 0 && (
-                  <div className="absolute left-0 top-full pt-2 z-50 w-56 invisible opacity-0 translate-y-1 transition duration-200 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-0">
-                    <div className="bg-white rounded-xl shadow-xl border border-neutral-200 py-2 normal-case tracking-normal">
-                      {category.subcategories.map((sub) => (
-                        <button
-                          key={sub}
-                          onClick={() => navigateToCategory(category.slug, sub)}
-                          className="w-full text-left px-4 py-2 text-xs font-medium text-neutral-700 hover:text-amber-900 hover:bg-neutral-50"
-                        >
-                          {sub}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          <button
-            onClick={browseOffers}
-            className={`flex items-center gap-1 text-rose-700 hover:text-rose-800 font-bold whitespace-nowrap py-1 ${
-              currentView === 'products' && saleOnly ? 'underline underline-offset-4' : ''
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>Special Offers</span>
-          </button>
-        </nav>
       </div>
 
       {/* Mobile Menu */}
@@ -365,7 +294,7 @@ export const Navbar: React.FC = () => {
             <Search className="w-4 h-4 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" aria-hidden="true" />
           </form>
 
-          <nav aria-label="Product categories" className="space-y-0.5">
+          <nav aria-label="Shop" className="space-y-0.5">
             <button
               onClick={closeMenusAnd(browseAllProducts)}
               className="w-full text-left px-3 py-2.5 text-sm font-semibold text-neutral-900 rounded-lg hover:bg-neutral-100"
@@ -379,48 +308,6 @@ export const Navbar: React.FC = () => {
               Special Offers
             </button>
 
-            {activeCategories.map((c) => {
-              const isExpanded = expandedCategoryId === c.id;
-              return (
-                <div key={c.id}>
-                  <div className="flex items-center">
-                    <button
-                      onClick={closeMenusAnd(() => navigateToCategory(c.slug))}
-                      className="flex-1 text-left px-3 py-2.5 text-sm font-medium text-neutral-900 rounded-lg hover:bg-neutral-100"
-                    >
-                      {c.name}
-                    </button>
-                    {c.subcategories.length > 0 && (
-                      <button
-                        onClick={() => setExpandedCategoryId(isExpanded ? null : c.id)}
-                        aria-expanded={isExpanded}
-                        aria-label={`${isExpanded ? 'Hide' : 'Show'} ${c.name} subcategories`}
-                        className="p-2.5 text-neutral-600 rounded-lg hover:bg-neutral-100"
-                      >
-                        <ChevronDown
-                          className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
-                          aria-hidden="true"
-                        />
-                      </button>
-                    )}
-                  </div>
-
-                  {isExpanded && (
-                    <div className="pl-5 pb-1 animate-in fade-in">
-                      {c.subcategories.map((sub) => (
-                        <button
-                          key={sub}
-                          onClick={closeMenusAnd(() => navigateToCategory(c.slug, sub))}
-                          className="w-full text-left px-3 py-2 text-sm text-neutral-700 rounded-lg hover:bg-neutral-100"
-                        >
-                          {sub}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
           </nav>
 
           <div className="pt-3 border-t border-neutral-200 space-y-0.5">

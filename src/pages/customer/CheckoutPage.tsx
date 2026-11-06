@@ -813,7 +813,7 @@ export const CheckoutPage: React.FC = () => {
         </div>
 
         {/* Sidebar Summary Card */}
-        <div className="bg-white rounded-3xl border border-neutral-200/80 p-6 shadow-xs space-y-4 lg:sticky lg:top-44">
+        <div className="bg-white rounded-3xl border border-neutral-200/80 p-6 shadow-xs space-y-4 lg:sticky lg:top-32">
           <h3 className="font-serif text-base font-bold text-neutral-900 border-b border-neutral-100 pb-3">
             Order Summary
           </h3>

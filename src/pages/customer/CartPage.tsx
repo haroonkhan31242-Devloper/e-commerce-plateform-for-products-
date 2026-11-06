@@ -152,7 +152,7 @@ export const CartPage: React.FC = () => {
         </div>
 
         {/* Order Summary */}
-        <div className="bg-white rounded-3xl border border-neutral-200 p-5 sm:p-6 space-y-5 lg:sticky lg:top-44">
+        <div className="bg-white rounded-3xl border border-neutral-200 p-5 sm:p-6 space-y-5 lg:sticky lg:top-32">
           <h2 className="font-serif text-lg font-bold text-neutral-900 border-b border-neutral-100 pb-3">
             Order Summary
           </h2>
