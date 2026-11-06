@@ -114,6 +114,14 @@ button:not(:disabled):active {
   outline-offset: 2px;
 }
 
+/* Keeps neighbouring columns from touching in every admin table */
+@media (min-width: 768px) {
+  .data-table th:not(:last-child),
+  .data-table td:not(:last-child) {
+    padding-right: 1rem;
+  }
+}
+
 /* Inputs below 16px trigger an automatic zoom on iOS */
 @media (max-width: 767px) {
   input:not([type='checkbox'], [type='radio'], [type='range']),

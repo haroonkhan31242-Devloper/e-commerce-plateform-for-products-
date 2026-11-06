@@ -4,7 +4,7 @@ import { AlertTriangle, CheckCircle2, Info, X, XCircle } from 'lucide-react';
 import { useToastActions, useToastState } from '../../context/ToastContext.tsx';
 import { ToastState, ToastType } from '../../types/index.ts';
 
-const VISIBLE_MS = 5000;
+const VISIBLE_MS = 1500;
 const ENTER_SECONDS = 0.5;
 const EXIT_SECONDS = 0.3;
 const ENTER_EASE = [0.22, 1, 0.36, 1] as const;

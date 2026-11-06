@@ -160,32 +160,46 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onInspectOrder }) => {
             </thead>
             <tbody className="divide-y divide-neutral-100">
               {orders.slice(0, 5).map((ord) => (
-                <tr key={ord.id} className="hover:bg-neutral-50/70 transition-colors">
-                  <td data-label="" className="py-3 font-mono font-bold text-neutral-900 whitespace-nowrap">
-                    {ord.orderNumber}
+                <tr key={ord.id} className="align-top hover:bg-neutral-50/70 transition-colors">
+                  <td data-label="" className="py-3">
+                    <div>
+                      <p className="flex items-center min-h-6 font-mono font-bold text-neutral-900 whitespace-nowrap">{ord.orderNumber}</p>
+                      <p className="text-[11px] text-neutral-500">{new Date(ord.date).toLocaleDateString()}</p>
+                    </div>
                   </td>
                   <td data-label="Customer" className="py-3">
                     <div>
-                      <p className="font-semibold text-neutral-800">{ord.customer.name}</p>
-                      <p className="text-[11px] text-neutral-500">{ord.customer.email}</p>
+                      <p className="flex items-center min-h-6 font-semibold text-neutral-800">{ord.customer.name}</p>
+                      <p className="text-[11px] text-neutral-500">{ord.customer.phone}</p>
                     </div>
                   </td>
-                  <td data-label="Total" className="py-3 font-bold text-neutral-900">
-                    {formatPrice(ord.grandTotal)}
+                  <td data-label="Total" className="py-3">
+                    <div>
+                      <p className="flex items-center min-h-6 justify-end md:justify-start font-bold text-neutral-900 whitespace-nowrap">
+                        {formatPrice(ord.grandTotal)}
+                      </p>
+                      <p className="text-[11px] text-neutral-500">
+                        {ord.items.length} {ord.items.length === 1 ? 'item' : 'items'}
+                      </p>
+                    </div>
                   </td>
                   <td data-label="Payment" className="py-3">
                     <div>
-                      <span className="text-xs text-neutral-600 block mb-0.5">
-                        {PAYMENT_METHOD_LABELS[ord.paymentMethod]}
-                      </span>
-                      <StatusBadge status={ord.paymentStatus} size="sm" />
+                      <div className="flex items-center min-h-6 justify-end md:justify-start">
+                        <StatusBadge status={ord.paymentStatus} size="sm" />
+                      </div>
+                      <p className="text-[11px] text-neutral-500">{PAYMENT_METHOD_LABELS[ord.paymentMethod]}</p>
                     </div>
                   </td>
                   <td data-label="Status" className="py-3">
-                    <StatusBadge status={ord.orderStatus} size="sm" />
+                    <div className="flex items-center min-h-6">
+                      <StatusBadge status={ord.orderStatus} size="sm" />
+                    </div>
                   </td>
                   <td data-label="" className="py-3 text-right">
-                    <OrderRowActions order={ord} onInspectOrder={onInspectOrder} />
+                    <div className="md:-mt-1.5">
+                      <OrderRowActions order={ord} onInspectOrder={onInspectOrder} />
+                    </div>
                   </td>
                 </tr>
               ))}
