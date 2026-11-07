@@ -123,10 +123,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
 
           <h3 className="font-serif font-semibold text-neutral-900 text-base leading-snug line-clamp-2">
-            {/* The stretched link makes the whole card clickable with one keyboard stop */}
+            {/* The stretched link makes the whole card clickable with one keyboard stop. The global
+                press effect must stay off: a transform here would shrink the link to the title. */}
             <button
               onClick={() => navigateToProduct(product.id)}
-              className="text-left group-hover:text-amber-800 after:absolute after:inset-0 after:z-10"
+              className="text-left group-hover:text-amber-800 active:transform-none! after:absolute after:inset-0 after:z-10"
             >
               {product.name}
             </button>

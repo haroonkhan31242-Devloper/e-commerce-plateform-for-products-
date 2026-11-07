@@ -5,6 +5,7 @@ import { useStore } from '../../context/StoreContext.tsx';
 import { ProductCard } from '../../components/customer/ProductCard.tsx';
 import { StarRating } from '../../components/common/StarRating.tsx';
 import { Reveal } from '../../components/common/Reveal.tsx';
+import { useSwipeNavigation } from '../../hooks/useSwipeNavigation.ts';
 import { sizedImage } from '../../utils/images.ts';
 
 const HERO_SLIDES = [
@@ -51,6 +52,9 @@ export const HomePage: React.FC = () => {
   } = useStore();
 
   const [activeSlide, setActiveSlide] = useState(0);
+  const heroSwipe = useSwipeNavigation<HTMLElement>((direction) =>
+    setActiveSlide((slide) => (slide + direction + HERO_SLIDES.length) % HERO_SLIDES.length)
+  );
 
   const bestSellers = products.filter((p) => p.isBestSeller && p.status === 'active');
   const newArrivals = products.filter((p) => p.isNewArrival && p.status === 'active');
@@ -60,7 +64,11 @@ export const HomePage: React.FC = () => {
   return (
     <div className="space-y-14 sm:space-y-20 pb-16 sm:pb-24">
       {/* Hero Carousel Section */}
-      <section className="relative overflow-hidden bg-neutral-950 text-white min-h-[520px] lg:min-h-[640px] flex items-center">
+      <section
+        ref={heroSwipe.ref}
+        {...heroSwipe.pointerHandlers}
+        className="relative overflow-hidden bg-neutral-950 text-white min-h-[520px] lg:min-h-[640px] flex items-center touch-pan-y"
+      >
         {/* Background Image with Gradient Overlay */}
         <div className="absolute inset-0 z-0">
           <AnimatePresence initial={false}>
