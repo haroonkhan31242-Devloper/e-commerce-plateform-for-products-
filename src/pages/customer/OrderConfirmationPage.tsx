@@ -2,6 +2,7 @@ import React from 'react';
 import { CheckCircle2, Truck, Clock } from 'lucide-react';
 import { useStore } from '../../context/StoreContext.tsx';
 import { StatusBadge } from '../../components/common/StatusBadge.tsx';
+import { BankTransferDetails } from '../../components/customer/BankTransferDetails.tsx';
 import { PAYMENT_METHOD_LABELS } from '../../utils/orders.ts';
 
 export const OrderConfirmationPage: React.FC = () => {
@@ -171,6 +172,13 @@ export const OrderConfirmationPage: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {order.paymentMethod === 'bank_transfer' && !order.bankTransferReference && (
+            <div className="bg-amber-50/70 rounded-3xl border border-amber-200 p-5 space-y-3">
+              <p className="text-xs font-bold text-amber-900 uppercase tracking-wider">Complete Your Bank Transfer</p>
+              <BankTransferDetails />
+            </div>
+          )}
 
           {/* Action CTAs */}
           <div className="space-y-3">

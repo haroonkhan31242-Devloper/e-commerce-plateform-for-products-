@@ -1,6 +1,7 @@
 import React from 'react';
 import { AnimatePresence, m } from 'motion/react';
 import { ShoppingBag, Trash2, ArrowRight, ArrowLeft, ShieldCheck, Truck } from 'lucide-react';
+import { getFreeShippingLabel } from '../../utils/orders.ts';
 import { useStore } from '../../context/StoreContext.tsx';
 import { sizedImage } from '../../utils/images.ts';
 import { EmptyState } from '../../components/common/EmptyState.tsx';
@@ -23,6 +24,7 @@ export const CartPage: React.FC = () => {
   } = useStore();
 
   const freeShippingThreshold = storeSettings.freeShippingThreshold;
+  const freeShippingLabel = getFreeShippingLabel(storeSettings);
   const progressToFreeShipping = Math.min(100, (cartSubtotal / freeShippingThreshold) * 100);
   const remainingForFreeShipping = Math.max(0, freeShippingThreshold - cartSubtotal);
 
@@ -68,8 +70,8 @@ export const CartPage: React.FC = () => {
           <Truck className="w-5 h-5 text-amber-800 shrink-0" aria-hidden="true" />
           <span className="text-sm text-amber-950 font-medium">
             {remainingForFreeShipping > 0
-              ? `Add ${formatPrice(remainingForFreeShipping)} more for free shipping`
-              : 'Your order qualifies for free shipping'}
+              ? `Add ${formatPrice(remainingForFreeShipping)} more for ${freeShippingLabel.toLowerCase()}`
+              : `Your order qualifies for ${freeShippingLabel.toLowerCase()}`}
           </span>
         </div>
         <div className="w-full sm:w-48 bg-amber-200/80 h-1.5 rounded-full overflow-hidden shrink-0">

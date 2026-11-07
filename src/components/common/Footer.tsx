@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext.tsx';
 import { BrandLogo } from './BrandLogo.tsx';
+import { getFreeShippingLabel } from '../../utils/orders.ts';
 import { subscribeToNewsletter } from '../../services/storeApi.ts';
 import { isValidEmail } from '../../utils/validation.ts';
 
@@ -63,7 +64,7 @@ export const Footer: React.FC = () => {
               <Truck className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="text-white font-semibold text-sm">Free Shipping</h4>
+              <h4 className="text-white font-semibold text-sm">{getFreeShippingLabel(storeSettings)}</h4>
               <p className="text-xs text-neutral-400 mt-1">
                 On orders over {formatPrice(storeSettings.freeShippingThreshold)}, with insured delivery.
               </p>
@@ -104,7 +105,7 @@ export const Footer: React.FC = () => {
             <div className="flex items-center gap-3">
               <BrandLogo className="h-12" />
               <span className="font-serif text-2xl font-bold tracking-widest text-white">
-                STEROSE
+                {storeSettings.storeName || 'STEROSE'}
               </span>
             </div>
             <p className="text-xs text-neutral-400 leading-relaxed max-w-sm">
@@ -132,7 +133,7 @@ export const Footer: React.FC = () => {
               Shop
             </h5>
             <ul className="space-y-1 text-xs">
-              {categories.filter((c) => c.isActive).slice(0, 6).map((cat) => (
+              {categories.filter((c) => c.isActive).map((cat) => (
                 <li key={cat.id}>
                   <button
                     onClick={() => navigateToCategory(cat.slug)}
@@ -229,7 +230,7 @@ export const Footer: React.FC = () => {
 
       {/* Bottom Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 border-t border-neutral-800 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-neutral-400">
-        <p>© {new Date().getFullYear()} STEROSE. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} {storeSettings.storeName || 'STEROSE'}. All rights reserved.</p>
         <div className="flex flex-wrap items-center justify-center gap-2">
           <span className="text-neutral-400">We accept:</span>
           <span className="px-2 py-0.5 bg-neutral-900 rounded border border-neutral-800 text-xs text-neutral-300">

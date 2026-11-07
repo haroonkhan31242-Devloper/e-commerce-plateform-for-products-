@@ -11,6 +11,7 @@ import {
 import { useStore } from '../../context/StoreContext.tsx';
 import { submitPaymentReference } from '../../services/storeApi.ts';
 import { StatusBadge } from '../../components/common/StatusBadge.tsx';
+import { BankTransferDetails } from '../../components/customer/BankTransferDetails.tsx';
 import { OrderStatus } from '../../types/index.ts';
 
 const TRACKING_STEPS: OrderStatus[] = [
@@ -305,7 +306,7 @@ export const OrderTrackingPage: React.FC = () => {
           </div>
 
           {/* Bank Transfer Wire Reference Submission (If applicable) */}
-          {activeOrder.paymentMethod === 'bank_transfer' && (
+          {activeOrder.paymentMethod === 'bank_transfer' && !isRejected && !isCancelled && (
             <div className="bg-amber-50/70 rounded-3xl border border-amber-200 p-6 shadow-xs space-y-3">
               <div className="flex items-center gap-2 text-xs font-bold text-amber-900 uppercase tracking-wider">
                 <Building2 className="w-4 h-4 text-amber-700" />
@@ -327,6 +328,7 @@ export const OrderTrackingPage: React.FC = () => {
                 </div>
               ) : (
                 <form onSubmit={handleWireSubmit} className="space-y-2">
+                  <BankTransferDetails />
                   <p className="text-xs text-neutral-700">
                     Completed your transfer? Enter the reference so our team can verify it.
                   </p>
@@ -334,7 +336,7 @@ export const OrderTrackingPage: React.FC = () => {
                     <input
                       type="text"
                       aria-label="Bank transfer reference"
-                      placeholder="e.g. WIRE-CHASE-88910"
+                      placeholder="e.g. WIRE-9988231"
                       value={wireRefInput}
                       onChange={(e) => setWireRefInput(e.target.value)}
                       className="flex-1 px-3 py-2 text-xs border border-amber-300 rounded-xl focus:outline-none focus:border-neutral-900 bg-white font-mono"

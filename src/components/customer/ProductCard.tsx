@@ -115,11 +115,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               {product.subcategory || product.categoryName}
             </span>
 
-            <div className="flex items-center gap-1 text-xs font-semibold text-neutral-700 shrink-0">
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" aria-hidden="true" />
-              <span>{product.rating}</span>
-              <span className="text-neutral-500 font-normal">({product.reviewCount})</span>
-            </div>
+            {product.reviewCount > 0 && (
+              <div className="flex items-center gap-1 text-xs font-semibold text-neutral-700 shrink-0">
+                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" aria-hidden="true" />
+                <span>{product.rating}</span>
+                <span className="text-neutral-500 font-normal">({product.reviewCount})</span>
+              </div>
+            )}
           </div>
 
           <h3 className="font-serif font-semibold text-neutral-900 text-base leading-snug line-clamp-2">

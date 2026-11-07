@@ -10,13 +10,21 @@ import {
   MapPin,
   Calendar,
   AlertTriangle,
+  RotateCcw,
 } from 'lucide-react';
 import { Order, OrderStatus } from '../../types/index.ts';
 import { useStore } from '../../context/StoreContext.tsx';
 import { StatusBadge } from '../../components/common/StatusBadge.tsx';
 import { Modal } from '../common/Overlay.tsx';
 import { ParcelLabelPanel } from './ParcelLabelPanel.tsx';
-import { FINAL_ORDER_STATUSES, PAYMENT_METHOD_LABELS } from '../../utils/orders.ts';
+import {
+  FINAL_ORDER_STATUSES,
+  getOrderStatusProblem,
+  isRevenueOrder,
+  needsRefund,
+  NEXT_ORDER_STATUSES,
+  PAYMENT_METHOD_LABELS,
+} from '../../utils/orders.ts';
 
 interface OrderDetailModalProps {
   order: Order | null;
@@ -86,6 +94,10 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order: liveO
 
   const handleVerifyBankWire = () => {
     updatePaymentStatus(order.id, 'Paid');
+  };
+
+  const handleRefund = () => {
+    updatePaymentStatus(order.id, 'Refunded');
   };
 
   return (
@@ -245,7 +257,18 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order: liveO
               </div>
 
               {/* Verify Wire Button if Pending or Awaiting Verification */}
-              {order.paymentStatus !== 'Paid' && (
+              {needsRefund(order) && (
+                <button
+                  type="button"
+                  onClick={handleRefund}
+                  className="px-3.5 py-1.5 bg-rose-700 hover:bg-rose-600 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-xs"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
+                  <span>Mark as Refunded</span>
+                </button>
+              )}
+
+              {order.paymentStatus !== 'Paid' && order.paymentStatus !== 'Refunded' && isRevenueOrder(order) && (
                 <button
                   type="button"
                   onClick={handleVerifyBankWire}
@@ -354,21 +377,31 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order: liveO
               {isFinalStatus ? (
                 <p className="text-neutral-600">This order is {order.orderStatus.toLowerCase()} and can no longer change.</p>
               ) : (
-                <div className="flex flex-wrap gap-2">
-                  {(['Accepted', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'] as OrderStatus[]).map((st) => (
-                    <button
-                  key={st}
-                  type="button"
-                  onClick={() => handleUpdateStatus(st)}
-                  className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all ${
-                    order.orderStatus === st
-                      ? 'bg-neutral-900 text-white shadow-xs'
-                      : 'bg-white border border-neutral-300 text-neutral-700 hover:bg-neutral-100'
-                  }`}
-                >
-                  Mark as {st}
-                </button>
-                  ))}
+                <div className="space-y-2">
+                  <div className="flex flex-wrap gap-2">
+                    {(NEXT_ORDER_STATUSES[order.orderStatus] ?? []).map((st) => {
+                      const problem = getOrderStatusProblem(order, st);
+                      return (
+                        <button
+                          key={st}
+                          type="button"
+                          disabled={!!problem}
+                          title={problem ?? undefined}
+                          onClick={() => handleUpdateStatus(st)}
+                          className="px-3 py-1.5 rounded-xl font-bold text-xs transition-all bg-white border border-neutral-300 text-neutral-700 hover:bg-neutral-100 disabled:opacity-50"
+                        >
+                          Mark as {st}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {order.orderStatus === 'Pending Confirmation' && (
+                    <p className="text-neutral-600">Accept this order before moving it forward.</p>
+                  )}
+                  {(NEXT_ORDER_STATUSES[order.orderStatus] ?? []).includes('Delivered') &&
+                    getOrderStatusProblem(order, 'Delivered') && (
+                      <p className="text-neutral-600">{getOrderStatusProblem(order, 'Delivered')}</p>
+                    )}
                 </div>
               )}
             </div>

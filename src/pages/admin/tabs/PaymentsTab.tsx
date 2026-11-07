@@ -4,7 +4,7 @@ import { AdminPanel } from '../../../components/admin/AdminPanel.tsx';
 import { StatusBadge } from '../../../components/common/StatusBadge.tsx';
 import { useStore } from '../../../context/StoreContext.tsx';
 import { Order } from '../../../types/index.ts';
-import { PAYMENT_METHOD_LABELS } from '../../../utils/orders.ts';
+import { isRevenueOrder, needsRefund, PAYMENT_METHOD_LABELS } from '../../../utils/orders.ts';
 
 interface PaymentsTabProps {
   onInspectOrder: (order: Order) => void;
@@ -49,18 +49,20 @@ export const PaymentsTab: React.FC<PaymentsTabProps> = ({ onInspectOrder }) => {
                   <StatusBadge status={ord.paymentStatus} size="sm" />
                 </td>
                 <td data-label="" className="py-3 text-right">
-                  {ord.paymentStatus !== 'Paid' ? (
+                  {needsRefund(ord) || (isRevenueOrder(ord) && ord.paymentStatus !== 'Paid' && ord.paymentStatus !== 'Refunded') ? (
                     <button
                       onClick={() => onInspectOrder(ord)}
                       className="px-3 py-2 bg-neutral-900 hover:bg-neutral-800 text-white rounded-lg text-xs font-bold"
                     >
                       Review
                     </button>
-                  ) : (
+                  ) : ord.paymentStatus === 'Paid' ? (
                     <span className="text-emerald-800 font-semibold inline-flex items-center gap-1">
                       <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
                       <span>Verified</span>
                     </span>
+                  ) : (
+                    <span className="text-neutral-500">No action needed</span>
                   )}
                 </td>
               </tr>

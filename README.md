@@ -2,7 +2,7 @@
 
 Single-vendor, multi-category e-commerce storefront with an admin portal, built with React, TypeScript, Vite and Tailwind CSS.
 
-Store data lives in `src/data` and is persisted to the browser's `localStorage`. `server.ts` serves the app. Accepted orders get a 4 x 6 in parcel label from the admin order panel, built in `src/utils/parcelLabel.ts` and `src/services/parcelLabelOutput.ts`. Prices are stored in the base currency set in `src/data/storeSettings.ts` and converted for display by `src/services/currencyService.ts`, which uses demo exchange rates until a live rates API is connected.
+Store data lives in `src/data` and is persisted to the browser's `localStorage`. `server.ts` serves the app. Accepted orders get a 4 x 6 in parcel label from the admin order panel, built in `src/utils/parcelLabel.ts` and `src/services/parcelLabelOutput.ts`. All prices are whole Pakistani rupees, formatted by `src/services/currencyService.ts`.
 
 ## Run locally
 

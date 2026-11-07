@@ -19,7 +19,7 @@ export const initialStoreSettings: StoreSettings = {
     accountNumber: '9984-7712-4091',
     iban: 'US33CHAS998477124091',
     swiftCode: 'CHASUS33XXX',
-    instructions: 'Please transfer the exact invoice grand total within 48 hours. Enter your Order Number as the transfer memo / reference, then enter your Wire Reference Code in the order tracking or payment portal.',
+    instructions: 'Please transfer the exact order total within 48 hours and use your Order Number as the transfer reference. After paying, enter your bank reference on the order tracking page.',
   },
   announcementText: 'Complimentary Express Shipping on all orders over {freeShipping}',
   isAnnouncementActive: true,

@@ -48,7 +48,7 @@ const ToastCard: React.FC<{ toast: ToastState }> = ({ toast }) => {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.96, transition: { duration: EXIT_SECONDS, ease: 'easeIn' } }}
       transition={{ duration: ENTER_SECONDS, ease: ENTER_EASE }}
-      className="pointer-events-auto relative w-full max-w-sm max-h-full overflow-y-auto flex flex-col items-center gap-3 p-6 text-center bg-white rounded-2xl border border-neutral-200 shadow-xl"
+      className="relative w-full max-w-sm max-h-full overflow-y-auto flex flex-col items-center gap-3 p-6 text-center bg-white rounded-2xl border border-neutral-200 shadow-xl"
     >
       <span className={`flex items-center justify-center w-12 h-12 rounded-full shrink-0 ${tile}`}>{icon}</span>
       <p className="text-sm leading-relaxed font-medium text-neutral-900 break-words max-w-full">
@@ -59,7 +59,7 @@ const ToastCard: React.FC<{ toast: ToastState }> = ({ toast }) => {
         type="button"
         onClick={() => dismissToast(toast.id)}
         aria-label="Dismiss notification"
-        className="absolute top-2 right-2 flex items-center justify-center w-8 h-8 rounded-full text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100"
+        className="pointer-events-auto absolute top-2 right-2 flex items-center justify-center w-8 h-8 rounded-full text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100"
       >
         <X className="w-4 h-4" aria-hidden="true" />
       </button>
@@ -67,8 +67,8 @@ const ToastCard: React.FC<{ toast: ToastState }> = ({ toast }) => {
   );
 };
 
-// The only notification surface in the app. Everything except the card itself lets
-// clicks through, so the page stays usable while a message is showing.
+// The only notification surface in the app. Everything except the dismiss button lets
+// clicks through, so a message never blocks a tap on the page behind it.
 export const Toast: React.FC = () => {
   const toast = useToastState();
   const isUrgent = toast?.type === 'error' || toast?.type === 'warning';

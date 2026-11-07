@@ -1,6 +1,7 @@
 import React from 'react';
 import { AnimatePresence, m } from 'motion/react';
 import { X, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
+import { getFreeShippingLabel } from '../../utils/orders.ts';
 import { useStore } from '../../context/StoreContext.tsx';
 import { sizedImage } from '../../utils/images.ts';
 import { Drawer } from '../common/Overlay.tsx';
@@ -32,6 +33,7 @@ export const CartDrawer: React.FC = () => {
   };
 
   const freeShippingThreshold = storeSettings.freeShippingThreshold;
+  const freeShippingLabel = getFreeShippingLabel(storeSettings);
   const progressToFreeShipping = Math.min(100, (cartSubtotal / freeShippingThreshold) * 100);
   const remainingForFreeShipping = Math.max(0, freeShippingThreshold - cartSubtotal);
 
@@ -60,8 +62,8 @@ export const CartDrawer: React.FC = () => {
         <div className="px-5 py-3 bg-amber-50 border-b border-amber-100">
           <p className="text-xs text-amber-950 font-medium mb-1.5">
             {remainingForFreeShipping > 0
-              ? `Add ${formatPrice(remainingForFreeShipping)} more for free shipping`
-              : 'Your order qualifies for free shipping'}
+              ? `Add ${formatPrice(remainingForFreeShipping)} more for ${freeShippingLabel.toLowerCase()}`
+              : `Your order qualifies for ${freeShippingLabel.toLowerCase()}`}
           </p>
           <div className="w-full bg-amber-200/60 h-1.5 rounded-full overflow-hidden">
             <div

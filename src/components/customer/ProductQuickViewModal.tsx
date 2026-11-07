@@ -112,9 +112,15 @@ export const ProductQuickViewModal: React.FC = () => {
             </h2>
 
             <div className="flex items-center gap-2">
-              <StarRating rating={product.rating} emptyClassName="text-neutral-300" />
-              <span className="text-xs font-semibold text-neutral-700">{product.rating}</span>
-              <span className="text-xs text-neutral-500">({product.reviewCount} reviews)</span>
+              {product.reviewCount > 0 ? (
+                <>
+                  <StarRating rating={product.rating} emptyClassName="text-neutral-300" />
+                  <span className="text-xs font-semibold text-neutral-700">{product.rating}</span>
+                  <span className="text-xs text-neutral-500">({product.reviewCount} reviews)</span>
+                </>
+              ) : (
+                <span className="text-xs text-neutral-500">No reviews yet</span>
+              )}
             </div>
 
             <div className="flex items-baseline gap-3">

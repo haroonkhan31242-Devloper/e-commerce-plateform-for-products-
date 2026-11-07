@@ -12,6 +12,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { STORE_COUNTRY } from '../../data/storeSettings.ts';
+import { BankTransferDetails } from '../../components/customer/BankTransferDetails.tsx';
 import { useStore } from '../../context/StoreContext.tsx';
 import { PaymentMethod, DeliveryInfo, CustomerInfo } from '../../types/index.ts';
 import { submitOrder } from '../../services/storeApi.ts';
@@ -45,7 +46,6 @@ export const CheckoutPage: React.FC = () => {
     cartSubtotal,
     getShippingCost,
     formatPrice,
-    storeSettings,
     customerUser,
     placeOrder,
     browseAllProducts,
@@ -122,9 +122,6 @@ export const CheckoutPage: React.FC = () => {
 
   const validatePayment = () => {
     const errs: Record<string, string> = {};
-    if (paymentMethod === 'bank_transfer' && !bankWireReference.trim()) {
-      errs.bankRef = 'Enter your bank transfer reference or transaction ID.';
-    }
     if (paymentMethod === 'online_card') {
       if (!isValidCardNumber(cardNumber)) errs.cardNumber = 'Enter a card number of 13 to 19 digits.';
       if (!isValidCardExpiry(cardExpiry)) errs.cardExpiry = 'Enter a future expiry date as MM/YY.';
@@ -176,6 +173,8 @@ export const CheckoutPage: React.FC = () => {
       shippingCost: effectiveShipping,
     };
 
+    const bankReference = paymentMethod === 'bank_transfer' ? bankWireReference.trim() || undefined : undefined;
+
     const orderItems = cart.map((item) => ({
       productId: item.productId,
       productName: item.product.name,
@@ -198,8 +197,8 @@ export const CheckoutPage: React.FC = () => {
         shippingCharge: effectiveShipping,
         grandTotal: finalGrandTotal,
         paymentMethod,
-        paymentStatus: paymentMethod === 'online_card' ? 'Paid' : 'Pending',
-        bankTransferReference: paymentMethod === 'bank_transfer' ? bankWireReference : undefined,
+        paymentStatus: paymentMethod === 'online_card' ? 'Paid' : bankReference ? 'Awaiting Verification' : 'Pending',
+        bankTransferReference: bankReference,
       });
     } catch (error) {
       console.error('Order submission failed', error);
@@ -618,42 +617,24 @@ export const CheckoutPage: React.FC = () => {
                   {paymentMethod === 'bank_transfer' && (
                     <div className="mt-4 pt-3 border-t border-neutral-200/80 space-y-3 text-xs bg-white p-4 rounded-xl border">
                       <p className="font-bold text-neutral-800">Bank Transfer Instructions:</p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-neutral-600 bg-neutral-50 p-3 rounded-lg break-words">
-                        <div>
-                          <span className="text-neutral-500 block font-sans">Bank:</span>
-                          <span className="font-bold text-neutral-900">{storeSettings.bankDetails.bankName}</span>
-                        </div>
-                        <div>
-                          <span className="text-neutral-500 block font-sans">Account Title:</span>
-                          <span className="font-bold text-neutral-900">{storeSettings.bankDetails.accountTitle}</span>
-                        </div>
-                        <div>
-                          <span className="text-neutral-500 block font-sans">IBAN / Account:</span>
-                          <span className="font-bold text-neutral-900">{storeSettings.bankDetails.iban}</span>
-                        </div>
-                        <div>
-                          <span className="text-neutral-500 block font-sans">SWIFT:</span>
-                          <span className="font-bold text-neutral-900">{storeSettings.bankDetails.swiftCode}</span>
-                        </div>
-                      </div>
-                      <p className="text-xs text-neutral-500 leading-relaxed">
-                        {storeSettings.bankDetails.instructions}
-                      </p>
+                      <BankTransferDetails />
 
                       <div>
                         <label htmlFor="checkout-page-field-9" className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
-                          Bank Wire Transaction Reference / Code *
+                          Bank Reference (optional)
                         </label>
                         <input
                           id="checkout-page-field-9"
                           type="text"
                           value={bankWireReference}
-                          aria-invalid={!!errors.bankRef}
                           onChange={(e) => setBankWireReference(e.target.value)}
                           placeholder="e.g. WIRE-9988231 or Bank Slip Reference"
                           className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-xl focus:outline-none focus:border-neutral-900 font-mono"
                         />
-                        {errors.bankRef && <p role="alert" className="text-xs text-rose-700 mt-1">{errors.bankRef}</p>}
+                        <p className="text-xs text-neutral-500 mt-1">
+                          Already paid? Add the reference now. Otherwise place your order, pay using your
+                          order number, and add it from the order tracking page.
+                        </p>
                       </div>
                     </div>
                   )}

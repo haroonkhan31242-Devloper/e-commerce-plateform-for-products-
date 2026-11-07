@@ -10,6 +10,19 @@ const STATIC_ROUTES: Record<string, AppView> = {
   account: 'account',
 };
 
+const ADMIN_TABS: AdminTab[] = [
+  'overview',
+  'orders',
+  'products',
+  'categories',
+  'inventory',
+  'customers',
+  'payments',
+  'shipping',
+  'reviews',
+  'settings',
+];
+
 const VIEW_PATHS: Partial<Record<AppView, string>> = {
   cart: 'cart',
   checkout: 'checkout',
@@ -27,11 +40,15 @@ export const useHashRouting = () => {
     selectedProductId,
     selectedCategorySlug,
     selectedSubcategory,
+    searchQuery,
+    saleOnly,
     setCurrentView,
     setAdminTab,
     setSelectedProductId,
     setSelectedCategorySlug,
     setSelectedSubcategory,
+    setSearchQuery,
+    setSaleOnly,
     setScannedParcelId,
   } = useStore();
 
@@ -42,17 +59,20 @@ export const useHashRouting = () => {
     if (currentView === 'admin') return `#/admin/${adminTab}`;
     if (currentView === 'products') {
       const parts = ['products', selectedCategorySlug, selectedSubcategory].filter(Boolean);
-      return `#/${parts.map((part) => encodeURIComponent(part as string)).join('/')}`;
+      const filters = [
+        searchQuery && `q=${encodeURIComponent(searchQuery)}`,
+        saleOnly && 'sale=1',
+      ].filter(Boolean);
+      const path = parts.map((part) => encodeURIComponent(part as string)).join('/');
+      return `#/${path}${filters.length > 0 ? `?${filters.join('&')}` : ''}`;
     }
     const path = VIEW_PATHS[currentView];
     return path ? `#/${path}` : '#/';
   };
 
   const applyHash = () => {
-    const [section, first, second] = window.location.hash
-      .replace(/^#\/?/, '')
-      .split('/')
-      .map(decodeURIComponent);
+    const [path, queryString] = window.location.hash.replace(/^#\/?/, '').split('?');
+    const [section, first, second] = path.split('/').map(decodeURIComponent);
 
     if (section === 'product' && first) {
       setSelectedProductId(first);
@@ -60,9 +80,17 @@ export const useHashRouting = () => {
     } else if (section === 'products') {
       setSelectedCategorySlug(first || null);
       setSelectedSubcategory(second || null);
+      const filters = new URLSearchParams(queryString);
+      setSearchQuery(filters.get('q') ?? '');
+      setSaleOnly(filters.get('sale') === '1');
       setCurrentView('products');
     } else if (section === 'admin') {
-      if (first) setAdminTab(first as AdminTab);
+      if (first && ADMIN_TABS.includes(first as AdminTab)) {
+        setAdminTab(first as AdminTab);
+      } else if (first) {
+        setAdminTab('overview');
+        window.history.replaceState(null, '', '#/admin/overview');
+      }
       if (first === 'orders' && second) setScannedParcelId(second);
       setCurrentView('admin');
     } else {
@@ -88,5 +116,5 @@ export const useHashRouting = () => {
       window.history.pushState(null, '', hash);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentView, adminTab, selectedProductId, selectedCategorySlug, selectedSubcategory]);
+  }, [currentView, adminTab, selectedProductId, selectedCategorySlug, selectedSubcategory, searchQuery, saleOnly]);
 };

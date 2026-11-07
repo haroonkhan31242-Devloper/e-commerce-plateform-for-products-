@@ -145,7 +145,7 @@ export const AdminDashboard: React.FC = () => {
             />
           )}
           {adminTab === 'categories' && <CategoriesTab onEditCategory={openCategoryModal} />}
-          {adminTab === 'inventory' && <InventoryTab />}
+          {adminTab === 'inventory' && <InventoryTab onEditProduct={openProductModal} />}
           {adminTab === 'customers' && <CustomersTab />}
           {adminTab === 'payments' && <PaymentsTab onInspectOrder={inspectOrder} />}
           {adminTab === 'reviews' && <ReviewsTab />}

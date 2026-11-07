@@ -84,6 +84,7 @@ export const Navbar: React.FC = () => {
     setIsMobileMenuOpen(false);
   };
 
+  const storeName = storeSettings.storeName || 'STEROSE';
   const announcementText = storeSettings.announcementText.replace(
     '{freeShipping}',
     formatPrice(storeSettings.freeShippingThreshold)
@@ -135,12 +136,12 @@ export const Navbar: React.FC = () => {
             <button
               onClick={closeMenusAnd(() => setCurrentView('home'))}
               className="flex items-center gap-2 sm:gap-3 select-none group min-w-0"
-              aria-label="STEROSE home"
+              aria-label={`${storeName} home`}
             >
               <BrandLogo className="h-9 sm:h-11" />
               <span className="flex flex-col items-start min-w-0">
-                <span className="font-serif text-lg min-[380px]:text-xl sm:text-3xl md:text-2xl lg:text-3xl font-bold tracking-wider sm:tracking-widest text-neutral-900 group-hover:text-amber-800 whitespace-nowrap">
-                  STEROSE
+                <span className="font-serif text-lg min-[380px]:text-xl sm:text-3xl md:text-2xl lg:text-3xl font-bold tracking-wider sm:tracking-widest text-neutral-900 group-hover:text-amber-800 whitespace-nowrap max-w-full truncate">
+                  {storeName}
                 </span>
                 <span className="text-[9px] min-[380px]:text-[10px] sm:text-xs leading-none tracking-wide sm:tracking-widest text-brand-gold uppercase font-semibold whitespace-nowrap">
                   Your World Store
@@ -204,7 +205,7 @@ export const Navbar: React.FC = () => {
                       </>
                     ) : (
                       <>
-                        <p className="text-xs text-neutral-600">Welcome to STEROSE</p>
+                        <p className="text-xs text-neutral-600">Welcome to {storeName}</p>
                         <p className="text-sm font-medium text-neutral-900">Sign in to manage orders</p>
                       </>
                     )}

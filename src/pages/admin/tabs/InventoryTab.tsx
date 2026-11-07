@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
-import { Minus, PackageMinus, PackagePlus, Plus } from 'lucide-react';
+import { Edit2, Minus, PackageMinus, PackagePlus, Plus } from 'lucide-react';
 import { AdminPanel, AdminSearchInput } from '../../../components/admin/AdminPanel.tsx';
 import { ActionMenu } from '../../../components/common/ActionMenu.tsx';
 import { useStore } from '../../../context/StoreContext.tsx';
+import { Product } from '../../../types/index.ts';
 
-export const InventoryTab: React.FC = () => {
+interface InventoryTabProps {
+  onEditProduct: (product: Product) => void;
+}
+
+export const InventoryTab: React.FC<InventoryTabProps> = ({ onEditProduct }) => {
   const { products, adjustStock } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -69,38 +74,50 @@ export const InventoryTab: React.FC = () => {
                     )}
                   </td>
                   <td data-label="" className="py-3 text-right">
-                    <div className="inline-flex items-center gap-1">
+                    {/* Stock lives on each option here, so a product-level change would not reach them */}
+                    {p.variations.length > 0 ? (
                       <button
-                        onClick={() => adjustStock(p.id, -1)}
-                        disabled={p.stock <= 0}
-                        aria-label={`Decrease stock of ${p.name} by 1`}
-                        className="inline-flex items-center justify-center w-9 h-9 border border-neutral-300 hover:bg-neutral-100 text-neutral-700 rounded-lg disabled:opacity-40"
+                        onClick={() => onEditProduct(p)}
+                        aria-label={`Edit option stock of ${p.name}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-2 border border-neutral-300 hover:bg-neutral-100 text-neutral-700 rounded-lg font-semibold"
                       >
-                        <Minus className="w-3.5 h-3.5" aria-hidden="true" />
+                        <Edit2 className="w-3.5 h-3.5" aria-hidden="true" />
+                        <span>Edit Options</span>
                       </button>
-                      <button
-                        onClick={() => adjustStock(p.id, 1)}
-                        aria-label={`Increase stock of ${p.name} by 1`}
-                        className="inline-flex items-center justify-center w-9 h-9 border border-neutral-300 hover:bg-neutral-100 text-neutral-700 rounded-lg"
-                      >
-                        <Plus className="w-3.5 h-3.5" aria-hidden="true" />
-                      </button>
-                      <ActionMenu
-                        label={`More stock actions for ${p.name}`}
-                        items={[
-                          {
-                            label: 'Add 10 units',
-                            icon: <PackagePlus className="w-3.5 h-3.5" aria-hidden="true" />,
-                            onSelect: () => adjustStock(p.id, 10),
-                          },
-                          {
-                            label: 'Remove 5 units',
-                            icon: <PackageMinus className="w-3.5 h-3.5" aria-hidden="true" />,
-                            onSelect: () => adjustStock(p.id, -5),
-                          },
-                        ]}
-                      />
-                    </div>
+                    ) : (
+                      <div className="inline-flex items-center gap-1">
+                        <button
+                          onClick={() => adjustStock(p.id, -1)}
+                          disabled={p.stock <= 0}
+                          aria-label={`Decrease stock of ${p.name} by 1`}
+                          className="inline-flex items-center justify-center w-9 h-9 border border-neutral-300 hover:bg-neutral-100 text-neutral-700 rounded-lg disabled:opacity-40"
+                        >
+                          <Minus className="w-3.5 h-3.5" aria-hidden="true" />
+                        </button>
+                        <button
+                          onClick={() => adjustStock(p.id, 1)}
+                          aria-label={`Increase stock of ${p.name} by 1`}
+                          className="inline-flex items-center justify-center w-9 h-9 border border-neutral-300 hover:bg-neutral-100 text-neutral-700 rounded-lg"
+                        >
+                          <Plus className="w-3.5 h-3.5" aria-hidden="true" />
+                        </button>
+                        <ActionMenu
+                          label={`More stock actions for ${p.name}`}
+                          items={[
+                            {
+                              label: 'Add 10 units',
+                              icon: <PackagePlus className="w-3.5 h-3.5" aria-hidden="true" />,
+                              onSelect: () => adjustStock(p.id, 10),
+                            },
+                            {
+                              label: 'Remove 5 units',
+                              icon: <PackageMinus className="w-3.5 h-3.5" aria-hidden="true" />,
+                              onSelect: () => adjustStock(p.id, -5),
+                            },
+                          ]}
+                        />
+                      </div>
+                    )}
                   </td>
                 </tr>
               );

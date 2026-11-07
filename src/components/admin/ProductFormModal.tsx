@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Trash2, Plus } from 'lucide-react';
 import { Product, ProductVariation } from '../../types/index.ts';
 import { useStore } from '../../context/StoreContext.tsx';
+import { getVariationStock } from '../../utils/product.ts';
 import { ProductImagePicker } from './ProductImagePicker.tsx';
 import { Modal } from '../common/Overlay.tsx';
 
@@ -36,6 +37,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
 
   // Variations
   const [variations, setVariations] = useState<ProductVariation[]>([]);
+  const effectiveStock = variations.length > 0 ? getVariationStock(variations) : stock;
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -113,7 +115,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
     if (sale !== undefined && (sale <= 0 || sale >= regularPrice)) {
       nextErrors.salePrice = 'Sale price must be between zero and the regular price.';
     }
-    if (stock < 0) nextErrors.stock = 'Stock cannot be negative.';
+    if (effectiveStock < 0) nextErrors.stock = 'Stock cannot be negative.';
     if (images.length === 0) nextErrors.images = 'Add at least one product image.';
     if (variations.some((v) => !v.name.trim() || v.options.length === 0 || v.options.some((o) => !o.label.trim()))) {
       nextErrors.variations = 'Each variation needs a name and at least one labeled option.';
@@ -137,7 +139,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
       subcategory,
       regularPrice: Number(regularPrice),
       salePrice: sale,
-      stock: Number(stock),
+      stock: Number(effectiveStock),
       lowStockThreshold: Number(lowStockThreshold),
       images,
       thumbnail: images[0],
@@ -338,11 +340,17 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                       id="product-form-modal-field-8"
                       type="number"
                       min="0"
-                      value={stock}
+                      value={effectiveStock}
+                      readOnly={variations.length > 0}
                       aria-invalid={!!errors.stock}
                       onChange={(e) => setStock(Number(e.target.value))}
-                      className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-xl focus:outline-none focus:border-neutral-900"
+                      className={`w-full px-3 py-2 text-xs border border-neutral-300 rounded-xl focus:outline-none focus:border-neutral-900 ${
+                        variations.length > 0 ? 'bg-neutral-100 text-neutral-600' : ''
+                      }`}
                     />
+                    {variations.length > 0 && (
+                      <p className="text-xs text-neutral-500 mt-1">Set by the option stock below.</p>
+                    )}
                     {errors.stock && <p role="alert" className="text-xs text-rose-700 mt-1">{errors.stock}</p>}
                   </div>
 

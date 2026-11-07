@@ -73,6 +73,19 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ settingsForm, setSetti
         </div>
 
         <div>
+          <label htmlFor="settings-tab-field-12" className="block font-bold text-neutral-700 uppercase tracking-wider mb-1">
+            Store Address
+          </label>
+          <input
+            id="settings-tab-field-12"
+            type="text"
+            value={settingsForm.address}
+            onChange={(e) => setSettingsForm({ ...settingsForm, address: e.target.value })}
+            className="w-full px-3 py-2 border border-neutral-300 rounded-xl"
+          />
+        </div>
+
+        <div>
           <label htmlFor="settings-tab-field-5" className="block font-bold text-neutral-700 uppercase tracking-wider mb-1">
             Announcement Banner
           </label>
@@ -134,7 +147,22 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ settingsForm, setSetti
               />
             </div>
             <div>
-              <label htmlFor="settings-tab-field-8" className="block font-semibold text-neutral-600 mb-1">IBAN / Account Number</label>
+              <label htmlFor="settings-tab-field-10" className="block font-semibold text-neutral-600 mb-1">Account Number</label>
+              <input
+                id="settings-tab-field-10"
+                type="text"
+                value={settingsForm.bankDetails.accountNumber}
+                onChange={(e) =>
+                  setSettingsForm({
+                    ...settingsForm,
+                    bankDetails: { ...settingsForm.bankDetails, accountNumber: e.target.value },
+                  })
+                }
+                className="w-full px-3 py-2 border border-neutral-300 rounded-xl font-mono"
+              />
+            </div>
+            <div>
+              <label htmlFor="settings-tab-field-8" className="block font-semibold text-neutral-600 mb-1">IBAN</label>
               <input
                 id="settings-tab-field-8"
                 type="text"
@@ -163,6 +191,23 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ settingsForm, setSetti
                 className="w-full px-3 py-2 border border-neutral-300 rounded-xl font-mono"
               />
             </div>
+          </div>
+          <div>
+            <label htmlFor="settings-tab-field-11" className="block font-semibold text-neutral-600 mb-1">
+              Transfer Instructions
+            </label>
+            <textarea
+              id="settings-tab-field-11"
+              rows={3}
+              value={settingsForm.bankDetails.instructions}
+              onChange={(e) =>
+                setSettingsForm({
+                  ...settingsForm,
+                  bankDetails: { ...settingsForm.bankDetails, instructions: e.target.value },
+                })
+              }
+              className="w-full px-3 py-2 border border-neutral-300 rounded-xl resize-none"
+            />
           </div>
         </div>
 

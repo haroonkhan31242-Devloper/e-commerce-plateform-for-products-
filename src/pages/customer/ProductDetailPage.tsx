@@ -13,6 +13,7 @@ import {
   Search,
   X,
 } from 'lucide-react';
+import { getFreeShippingLabel } from '../../utils/orders.ts';
 import { useStore } from '../../context/StoreContext.tsx';
 import { CartItemVariationChoice } from '../../types/index.ts';
 import { ProductCard } from '../../components/customer/ProductCard.tsx';
@@ -31,7 +32,7 @@ import { StarRating } from '../../components/common/StarRating.tsx';
 
 export const ProductDetailPage: React.FC = () => {
   const {
-    products,
+    storefrontProducts: products,
     orders,
     customerUser,
     storeSettings,
@@ -48,7 +49,7 @@ export const ProductDetailPage: React.FC = () => {
     showToast,
   } = useStore();
 
-  const product = products.find((p) => p.id === selectedProductId && p.status === 'active');
+  const product = products.find((p) => p.id === selectedProductId);
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -136,7 +137,7 @@ export const ProductDetailPage: React.FC = () => {
 
   // Related products from same category
   const relatedProducts = products
-    .filter((p) => p.categoryId === product.categoryId && p.id !== product.id && p.status === 'active')
+    .filter((p) => p.categoryId === product.categoryId && p.id !== product.id)
     .slice(0, 4);
 
   return (
@@ -221,11 +222,17 @@ export const ProductDetailPage: React.FC = () => {
 
             {/* Rating Stars & Review Summary */}
             <div className="flex items-center gap-3 mt-3">
-              <StarRating rating={product.rating} />
-              <span className="text-xs font-bold text-neutral-800">{product.rating}</span>
-              <span className="text-xs text-neutral-500 font-normal">
-                ({product.reviewCount} reviews)
-              </span>
+              {product.reviewCount > 0 ? (
+                <>
+                  <StarRating rating={product.rating} />
+                  <span className="text-xs font-bold text-neutral-800">{product.rating}</span>
+                  <span className="text-xs text-neutral-500 font-normal">
+                    ({product.reviewCount} reviews)
+                  </span>
+                </>
+              ) : (
+                <span className="text-xs text-neutral-500">No reviews yet</span>
+              )}
             </div>
           </div>
 
@@ -326,7 +333,7 @@ export const ProductDetailPage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-neutral-100 text-sm text-neutral-600">
             <div className="flex items-center gap-2.5">
               <Truck className="w-4 h-4 text-amber-700 shrink-0" />
-              <span>Free shipping over {formatPrice(storeSettings.freeShippingThreshold)}</span>
+              <span>{getFreeShippingLabel(storeSettings)} over {formatPrice(storeSettings.freeShippingThreshold)}</span>
             </div>
             <div className="flex items-center gap-2.5">
               <RotateCcw className="w-4 h-4 text-amber-700 shrink-0" />
@@ -371,9 +378,15 @@ export const ProductDetailPage: React.FC = () => {
               Customer Reviews
             </h3>
             <div className="flex items-center gap-2 mt-1">
-              <StarRating rating={product.rating} />
-              <span className="text-xs font-bold text-neutral-900">{product.rating} out of 5</span>
-              <span className="text-xs text-neutral-500">({product.reviews.length} reviews)</span>
+              {product.reviewCount > 0 ? (
+                <>
+                  <StarRating rating={product.rating} />
+                  <span className="text-xs font-bold text-neutral-900">{product.rating} out of 5</span>
+                  <span className="text-xs text-neutral-500">({product.reviewCount} reviews)</span>
+                </>
+              ) : (
+                <span className="text-xs text-neutral-500">No reviews yet</span>
+              )}
             </div>
           </div>
 

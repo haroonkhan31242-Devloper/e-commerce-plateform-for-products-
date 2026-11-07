@@ -15,6 +15,26 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
 
 export const FINAL_ORDER_STATUSES: OrderStatus[] = ['Delivered', 'Rejected', 'Cancelled'];
 
+// Accepting and rejecting a pending order have their own actions, so only cancelling is listed
+export const NEXT_ORDER_STATUSES: Partial<Record<OrderStatus, OrderStatus[]>> = {
+  'Pending Confirmation': ['Cancelled'],
+  Accepted: ['Processing', 'Cancelled'],
+  Processing: ['Shipped', 'Cancelled'],
+  Shipped: ['Out for Delivery', 'Delivered', 'Cancelled'],
+  'Out for Delivery': ['Delivered', 'Cancelled'],
+};
+
+// Cash on delivery is collected at the door; anything else must be paid first
+export const getOrderStatusProblem = (order: Order, newStatus: OrderStatus): string | null => {
+  if (!NEXT_ORDER_STATUSES[order.orderStatus]?.includes(newStatus)) {
+    return `An order that is ${order.orderStatus} cannot move to ${newStatus}.`;
+  }
+  if (newStatus === 'Delivered' && order.paymentMethod !== 'cod' && order.paymentStatus !== 'Paid') {
+    return 'Mark this order as paid before delivering it.';
+  }
+  return null;
+};
+
 export const appendTimelineEvent = (
   order: Order,
   event: Omit<TimelineEvent, 'timestamp'>
@@ -35,8 +55,14 @@ export const calculateShipping = (
   return option === 'express' ? settings.expressShippingFee : settings.standardShippingFee;
 };
 
+// Standard delivery may already be free, in which case the threshold only upgrades express
+export const getFreeShippingLabel = (settings: StoreSettings) =>
+  settings.standardShippingFee === 0 ? 'Free express shipping' : 'Free shipping';
+
 export const isRevenueOrder = (order: Order) =>
   order.orderStatus !== 'Rejected' && order.orderStatus !== 'Cancelled';
+
+export const needsRefund = (order: Order) => !isRevenueOrder(order) && order.paymentStatus === 'Paid';
 
 export const getCustomerDirectory = (orders: Order[]) => {
   const customers = new Map<

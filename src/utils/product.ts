@@ -1,4 +1,8 @@
-import { CartItemVariationChoice, Product, Review } from '../types/index.ts';
+import { CartItemVariationChoice, Category, Product, ProductVariation, Review } from '../types/index.ts';
+
+// Shoppers only see active products, and a hidden category hides everything in it
+export const isOnStorefront = (product: Product, categories: Category[]): boolean =>
+  product.status === 'active' && categories.find((c) => c.id === product.categoryId)?.isActive !== false;
 
 type PricedProduct = Pick<Product, 'regularPrice' | 'salePrice'>;
 
@@ -42,6 +46,10 @@ export const getAvailableStock = (product: Product, choices: CartItemVariationCh
     product.stock
   );
 
+// With options, a product can only sell as many units as its smallest variation holds
+export const getVariationStock = (variations: ProductVariation[]): number =>
+  Math.min(...variations.map((v) => v.options.reduce((sum, option) => sum + option.stock, 0)));
+
 // Applies a stock change to the product and to each chosen option
 export const changeStock = (
   product: Product,
@@ -66,9 +74,9 @@ export const isLightColor = (hex: string): boolean => {
   return luminance > 170;
 };
 
-// Products with no reviews fall back to a 5.0 rating
+// 0 means no published reviews yet, which the storefront shows as unrated
 export const calculateAverageRating = (reviews: Review[]): number => {
-  if (reviews.length === 0) return 5.0;
+  if (reviews.length === 0) return 0;
   const average = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
   return Number(average.toFixed(1));
 };

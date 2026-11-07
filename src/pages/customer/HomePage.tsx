@@ -45,7 +45,7 @@ const HERO_SLIDES = [
 
 export const HomePage: React.FC = () => {
   const {
-    products,
+    storefrontProducts: products,
     categories,
     navigateToCategory,
     browseAllProducts,
@@ -56,8 +56,8 @@ export const HomePage: React.FC = () => {
     setActiveSlide((slide) => (slide + direction + HERO_SLIDES.length) % HERO_SLIDES.length)
   );
 
-  const bestSellers = products.filter((p) => p.isBestSeller && p.status === 'active');
-  const newArrivals = products.filter((p) => p.isNewArrival && p.status === 'active');
+  const bestSellers = products.filter((p) => p.isBestSeller);
+  const newArrivals = products.filter((p) => p.isNewArrival);
 
   const currentHero = HERO_SLIDES[activeSlide];
 
@@ -171,7 +171,7 @@ export const HomePage: React.FC = () => {
                 {cat.name}
               </h3>
               <p className="text-[11px] text-neutral-600 mt-1">
-                {products.filter((p) => p.categoryId === cat.id && p.status === 'active').length} products
+                {products.filter((p) => p.categoryId === cat.id).length} products
               </p>
             </button>
           ))}

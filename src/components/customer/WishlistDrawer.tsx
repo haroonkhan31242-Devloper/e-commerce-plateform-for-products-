@@ -13,7 +13,7 @@ export const WishlistDrawer: React.FC = () => {
     setIsWishlistDrawerOpen,
     wishlist,
     toggleWishlist,
-    products,
+    storefrontProducts: products,
     formatPrice,
     addToCart,
     openQuickView,

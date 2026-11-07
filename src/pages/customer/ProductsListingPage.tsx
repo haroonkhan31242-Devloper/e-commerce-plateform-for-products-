@@ -10,7 +10,7 @@ type SortOption = 'featured' | 'price-asc' | 'price-desc' | 'rating' | 'newest' 
 
 export const ProductsListingPage: React.FC = () => {
   const {
-    products,
+    storefrontProducts: activeProducts,
     categories,
     selectedCategorySlug,
     setSelectedCategorySlug,
@@ -39,7 +39,6 @@ export const ProductsListingPage: React.FC = () => {
   }, []);
 
   const activeCategories = categories.filter((c) => c.isActive);
-  const activeProducts = useMemo(() => products.filter((p) => p.status === 'active'), [products]);
 
   // The price slider spans the catalog, so no product is hidden by default
   const priceCeiling = useMemo(
@@ -58,8 +57,8 @@ export const ProductsListingPage: React.FC = () => {
   const filteredProducts = useMemo(() => {
     return activeProducts.filter((prod) => {
       // Category filter
-      if (selectedCategorySlug && currentCategory) {
-        if (prod.categoryId !== currentCategory.id) return false;
+      if (selectedCategorySlug) {
+        if (prod.categoryId !== currentCategory?.id) return false;
       }
 
       // Subcategory filter
@@ -284,11 +283,19 @@ export const ProductsListingPage: React.FC = () => {
           </nav>
 
           <h1 className="font-serif text-3xl sm:text-4xl font-bold text-neutral-900">
-            {currentCategory ? currentCategory.name : onSaleOnly ? 'Special Offers' : 'All Products'}
+            {currentCategory
+              ? currentCategory.name
+              : selectedCategorySlug
+              ? 'Category Unavailable'
+              : onSaleOnly
+              ? 'Special Offers'
+              : 'All Products'}
           </h1>
           <p className="text-sm text-neutral-600 mt-1 max-w-xl">
             {currentCategory
               ? currentCategory.description
+              : selectedCategorySlug
+              ? 'This category is not available right now.'
               : 'Healthcare, fashion, baby essentials, beauty, and jewelry, all in one place.'}
           </p>
         </div>

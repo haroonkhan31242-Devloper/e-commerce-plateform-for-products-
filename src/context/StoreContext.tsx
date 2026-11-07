@@ -25,12 +25,13 @@ import { useToastActions } from './ToastContext.tsx';
 import { canHaveParcelLabel, createParcelLabel } from '../utils/parcelLabel.ts';
 import { formatMoney } from '../services/currencyService.ts';
 import { loginAdmin } from '../services/storeApi.ts';
-import { appendTimelineEvent, calculateShipping } from '../utils/orders.ts';
+import { appendTimelineEvent, calculateShipping, getOrderStatusProblem } from '../utils/orders.ts';
 import {
   calculateAverageRating,
   changeStock,
   getAvailableStock,
   getUnitPrice,
+  isOnStorefront,
 } from '../utils/product.ts';
 
 interface StoreContextType {
@@ -58,6 +59,7 @@ interface StoreContextType {
 
   // Data
   products: Product[];
+  storefrontProducts: Product[];
   categories: Category[];
   orders: Order[];
   storeSettings: StoreSettings;
@@ -187,11 +189,20 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [trackingOrderId, setTrackingOrderId] = useState<string | null>(null);
 
 
-  // Cart lines follow catalog edits: price and stock changes apply, deleted products drop out
+  const storefrontProducts = useMemo(
+    () => products.filter((product) => isOnStorefront(product, categories)),
+    [products, categories]
+  );
+
+  // Cart lines follow catalog edits: price and stock changes apply, and products that are
+  // deleted or taken off the storefront drop out
   useEffect(() => {
+    if (cart.some((item) => !storefrontProducts.some((p) => p.id === item.productId))) {
+      showToast('info', 'An item in your bag is no longer available and was removed.');
+    }
     setCart((prev) => {
       const next = prev.flatMap((item) => {
-        const product = products.find((p) => p.id === item.productId);
+        const product = storefrontProducts.find((p) => p.id === item.productId);
         if (!product) return [];
         return [{ ...item, product, unitPrice: getUnitPrice(product, item.selectedVariations) }];
       });
@@ -200,7 +211,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       );
       return isUnchanged && next.length === prev.length ? prev : next;
     });
-  }, [products, setCart]);
+  }, [storefrontProducts, setCart]);
 
   // Cart Calculations
   const cartSubtotal = useMemo(() => {
@@ -436,6 +447,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     courierName?: string,
     trackingNumber?: string
   ) => {
+    const order = orders.find((o) => o.id === orderId);
+    const problem = order ? getOrderStatusProblem(order, newStatus) : 'This order could not be found.';
+    if (problem) {
+      showToast('error', problem);
+      return;
+    }
+
     if (newStatus === 'Cancelled') restockOrderOnce(orderId);
     updateOrderById(orderId, (ord) => ({
       ...appendTimelineEvent(ord, {
@@ -444,6 +462,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         actor: 'admin',
       }),
       orderStatus: newStatus,
+      // The courier collects cash on delivery, so delivering it settles the payment
+      paymentStatus: newStatus === 'Delivered' && ord.paymentMethod === 'cod' ? 'Paid' : ord.paymentStatus,
       courierName: courierName || ord.courierName,
       trackingNumber: trackingNumber || ord.trackingNumber,
     }));
@@ -503,7 +523,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       id: `prod-${Date.now()}`,
       createdAt: new Date().toISOString().split('T')[0],
       reviews: [],
-      rating: 5.0,
+      rating: 0,
       reviewCount: 0,
     };
     setProducts((prev) => [newProduct, ...prev]);
@@ -560,12 +580,16 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   // Reviews Moderation
-  const withReviews = (product: Product, reviews: Review[]): Product => ({
-    ...product,
-    reviews,
-    rating: calculateAverageRating(reviews),
-    reviewCount: reviews.length,
-  });
+  // Only published reviews count towards the rating shoppers see
+  const withReviews = (product: Product, reviews: Review[]): Product => {
+    const published = reviews.filter((review) => review.isApproved);
+    return {
+      ...product,
+      reviews,
+      rating: calculateAverageRating(published),
+      reviewCount: published.length,
+    };
+  };
 
   const addProductReview = (productId: string, review: Omit<Review, 'id' | 'date' | 'isApproved'>) => {
     const newRev: Review = {
@@ -575,14 +599,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       isApproved: true, // auto-approved for instant demo visibility, admin can moderate
     };
     updateProductById(productId, (p) => withReviews(p, [newRev, ...p.reviews]));
-    showToast('success', 'Thank you! Your verified review has been published.');
+    showToast('success', 'Thank you! Your review has been published.');
   };
 
   const moderateReview = (productId: string, reviewId: string, isApproved: boolean) => {
-    updateProductById(productId, (p) => ({
-      ...p,
-      reviews: p.reviews.map((r) => (r.id === reviewId ? { ...r, isApproved } : r)),
-    }));
+    updateProductById(productId, (p) =>
+      withReviews(p, p.reviews.map((r) => (r.id === reviewId ? { ...r, isApproved } : r)))
+    );
     showToast('success', `Review ${isApproved ? 'approved' : 'hidden'}.`);
   };
 
@@ -650,6 +673,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         searchProducts,
         trackOrder,
         products,
+        storefrontProducts,
         categories,
         orders,
         storeSettings,
