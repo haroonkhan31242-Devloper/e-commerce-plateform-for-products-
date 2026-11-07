@@ -93,7 +93,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ settingsForm, setSetti
             <span>Show the announcement banner on the storefront</span>
           </label>
           <p className="text-xs text-neutral-500 mt-1">
-            Use {'{freeShipping}'} to show the free shipping threshold in each shopper's currency.
+            Use {'{freeShipping}'} to show the free shipping threshold.
           </p>
         </div>
 

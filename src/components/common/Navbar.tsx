@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext.tsx';
 import { BrandLogo } from './BrandLogo.tsx';
-import { CurrencySelector } from './CurrencySelector.tsx';
 
 const CountBadge: React.FC<{ count: number; className: string }> = ({ count, className }) => (
   <m.span
@@ -107,8 +106,6 @@ export const Navbar: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
-            <CurrencySelector />
-
             <button
               onClick={() => setCurrentView('admin')}
               className="hidden sm:flex items-center gap-1.5 py-1 font-semibold text-neutral-200 hover:text-white"

@@ -6,6 +6,9 @@ import { OrderRowActions } from '../../../components/admin/OrderRowActions.tsx';
 import { Order } from '../../../types/index.ts';
 import { getDailyRevenue, isRevenueOrder, PAYMENT_METHOD_LABELS } from '../../../utils/orders.ts';
 
+// Full rupee amounts are too wide for the daily bars on a phone
+const compactAmount = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 0 });
+
 interface OverviewTabProps {
   onInspectOrder: (order: Order) => void;
 }
@@ -76,7 +79,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onInspectOrder }) => {
         <div className="lg:col-span-2 bg-white rounded-3xl border border-neutral-200/80 p-6 shadow-xs space-y-4">
           <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
             <h3 className="font-serif text-sm font-bold text-neutral-900">
-              Revenue, Last 7 Days
+              Revenue, Last 7 Days (PKR)
             </h3>
             <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full">
               {formatPrice(lastSevenDaysRevenue)}
@@ -87,7 +90,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onInspectOrder }) => {
                 {dailyRevenue.map((bar) => (
                   <div key={bar.label} className="flex-1 min-w-0 flex flex-col items-center gap-2 group">
                     <span className="text-xs font-bold text-neutral-600 whitespace-nowrap">
-                      {bar.amount > 0 ? formatPrice(bar.amount) : '-'}
+                      {bar.amount > 0 ? compactAmount.format(bar.amount) : '-'}
                     </span>
                     <div className="h-36 w-full flex items-end">
                       <div

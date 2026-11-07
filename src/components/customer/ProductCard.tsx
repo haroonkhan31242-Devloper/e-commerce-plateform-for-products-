@@ -135,11 +135,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <p className="hidden sm:block text-sm text-neutral-600 mt-1 line-clamp-1">{product.shortDescription}</p>
         </div>
 
-        <div className="pt-3 border-t border-neutral-100 mt-3 flex items-center justify-between gap-2">
-          <div className="flex items-baseline gap-2 min-w-0">
-            <span className="text-lg font-bold text-neutral-900">{formatPrice(getEffectivePrice(product))}</span>
+        <div className="pt-3 border-t border-neutral-100 mt-3 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-col min-w-0">
+            <span className="text-lg font-bold text-neutral-900 whitespace-nowrap">{formatPrice(getEffectivePrice(product))}</span>
             {hasDiscount && (
-              <span className="text-xs text-neutral-500 line-through">{formatPrice(product.regularPrice)}</span>
+              <span className="text-xs text-neutral-500 line-through whitespace-nowrap">{formatPrice(product.regularPrice)}</span>
             )}
           </div>
 
@@ -153,7 +153,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 ? `Choose options for ${product.name}`
                 : `Add ${product.name} to bag`
             }
-            className="relative z-20 p-2.5 rounded-xl bg-neutral-900 text-white hover:bg-amber-600 disabled:bg-neutral-100 disabled:text-neutral-400 shrink-0"
+            className="relative z-20 ml-auto p-2.5 rounded-xl bg-neutral-900 text-white hover:bg-amber-600 disabled:bg-neutral-100 disabled:text-neutral-400 shrink-0"
           >
             <ShoppingBag className="w-4 h-4" aria-hidden="true" />
           </button>

@@ -29,7 +29,7 @@ src/
   data/            Seed data (replace with API calls when adding a backend)
   hooks/           Reusable React hooks, including URL hash routing
   pages/           Customer pages and the admin dashboard (admin/tabs)
-  services/        Client API layer; storeApi.ts, imageStorage.ts and currencyService.ts hold the mock calls to swap for REST
+  services/        Client API layer; storeApi.ts and imageStorage.ts hold the mock calls to swap for REST
   types/           Domain types
   utils/           Pure business helpers
 ```

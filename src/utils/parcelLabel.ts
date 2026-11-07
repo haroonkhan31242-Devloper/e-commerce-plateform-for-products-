@@ -70,9 +70,8 @@ const getCollection = (order: Order, total: string) => {
 };
 
 // Built from the live order each time, so a reprint carries any corrected details.
-// Amounts use the store's base currency, not the admin's display currency.
 export const getLabelContent = (order: Order, label: ParcelLabel, settings: StoreSettings): ParcelLabelContent => {
-  const total = formatMoney(order.grandTotal, settings.currency);
+  const total = formatMoney(order.grandTotal);
   const collection = getCollection(order, total);
   const date = new Date(order.date);
   const cityLine = [clean(order.delivery?.city), clean(order.delivery?.postalCode)].filter(Boolean).join(' ');

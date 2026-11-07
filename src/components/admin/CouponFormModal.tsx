@@ -15,7 +15,7 @@ export const CouponFormModal: React.FC<CouponFormModalProps> = ({
   onClose,
   couponToEdit,
 }) => {
-  const { coupons, addCoupon, updateCoupon, showToast, baseCurrency } = useStore();
+  const { coupons, addCoupon, updateCoupon, showToast } = useStore();
 
   const [code, setCode] = useState('');
   const [type, setType] = useState<'percentage' | 'fixed'>('percentage');
@@ -74,7 +74,7 @@ export const CouponFormModal: React.FC<CouponFormModalProps> = ({
       value: Number(value),
       minOrderAmount: Number(minOrderAmount),
       expiryDate,
-      description: description.trim() || `${value}${type === 'percentage' ? '%' : ` ${baseCurrency}`} discount`,
+      description: description.trim() || `${value}${type === 'percentage' ? '%' : ' PKR'} discount`,
       isActive,
       maxUsage: maxUsage ? Number(maxUsage) : undefined,
     };
@@ -130,13 +130,13 @@ export const CouponFormModal: React.FC<CouponFormModalProps> = ({
                 className="w-full px-3 py-2 border border-neutral-300 rounded-xl bg-white"
               >
                 <option value="percentage">Percentage (%)</option>
-                <option value="fixed">Fixed Amount ({baseCurrency})</option>
+                <option value="fixed">Fixed Amount (PKR)</option>
               </select>
             </div>
 
             <div>
               <label htmlFor="coupon-form-modal-field-3" className="block font-bold text-neutral-700 uppercase tracking-wider mb-1">
-                Discount Amount {type === 'percentage' ? '(%)' : `(${baseCurrency})`}
+                Discount Amount {type === 'percentage' ? '(%)' : '(PKR)'}
               </label>
               <input
                 id="coupon-form-modal-field-3"
@@ -153,7 +153,7 @@ export const CouponFormModal: React.FC<CouponFormModalProps> = ({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label htmlFor="coupon-form-modal-field-4" className="block font-bold text-neutral-700 uppercase tracking-wider mb-1">
-                Min. Order Amount ({baseCurrency})
+                Min. Order Amount (PKR)
               </label>
               <input
                 id="coupon-form-modal-field-4"

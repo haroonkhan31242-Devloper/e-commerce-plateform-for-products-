@@ -10,8 +10,8 @@ export const initialProducts: Product[] = [
     categoryId: 'cat-1',
     categoryName: 'Healthcare Products',
     subcategory: 'Diagnostics & Monitors',
-    regularPrice: 89.00,
-    salePrice: 69.99,
+    regularPrice: 24742,
+    salePrice: 19457,
     stock: 24,
     lowStockThreshold: 5,
     images: [
@@ -34,7 +34,7 @@ export const initialProducts: Product[] = [
         name: 'Cuff Size',
         options: [
           { label: 'Standard (22-42 cm)', value: 'standard', stock: 18 },
-          { label: 'XL Wide Cuff (32-52 cm)', value: 'xl', stock: 6, priceAdjustment: 5 },
+          { label: 'XL Wide Cuff (32-52 cm)', value: 'xl', stock: 6, priceAdjustment: 1390 },
         ],
       },
     ],
@@ -75,7 +75,7 @@ export const initialProducts: Product[] = [
     categoryId: 'cat-1',
     categoryName: 'Healthcare Products',
     subcategory: 'Vitamins & Supplements',
-    regularPrice: 42.00,
+    regularPrice: 11676,
     stock: 45,
     lowStockThreshold: 10,
     images: [
@@ -95,7 +95,7 @@ export const initialProducts: Product[] = [
         name: 'Pack Size',
         options: [
           { label: '60 Capsules (30-day supply)', value: '60-caps', stock: 25 },
-          { label: '120 Capsules (60-day supply)', value: '120-caps', stock: 20, priceAdjustment: 30 },
+          { label: '120 Capsules (60-day supply)', value: '120-caps', stock: 20, priceAdjustment: 8340 },
         ],
       },
     ],
@@ -129,8 +129,8 @@ export const initialProducts: Product[] = [
     categoryId: 'cat-2',
     categoryName: "Ladies' Fashion",
     subcategory: 'Dresses & Gowns',
-    regularPrice: 285.00,
-    salePrice: 228.00,
+    regularPrice: 79230,
+    salePrice: 63384,
     stock: 15,
     lowStockThreshold: 3,
     images: [
@@ -195,7 +195,7 @@ export const initialProducts: Product[] = [
     categoryId: 'cat-2',
     categoryName: "Ladies' Fashion",
     subcategory: 'Outerwear & Trench',
-    regularPrice: 340.00,
+    regularPrice: 94520,
     stock: 12,
     lowStockThreshold: 3,
     images: [
@@ -260,8 +260,8 @@ export const initialProducts: Product[] = [
     categoryId: 'cat-3',
     categoryName: "Gents' Fashion",
     subcategory: 'Suits & Blazers',
-    regularPrice: 495.00,
-    salePrice: 395.00,
+    regularPrice: 137610,
+    salePrice: 109810,
     stock: 10,
     lowStockThreshold: 2,
     images: [
@@ -324,7 +324,7 @@ export const initialProducts: Product[] = [
     categoryId: 'cat-3',
     categoryName: "Gents' Fashion",
     subcategory: 'Oxford & Linen Shirts',
-    regularPrice: 125.00,
+    regularPrice: 34750,
     stock: 28,
     lowStockThreshold: 5,
     images: [
@@ -390,8 +390,8 @@ export const initialProducts: Product[] = [
     categoryId: 'cat-4',
     categoryName: 'Baby Garments',
     subcategory: 'Organic Rompers & Onesies',
-    regularPrice: 58.00,
-    salePrice: 46.00,
+    regularPrice: 16124,
+    salePrice: 12788,
     stock: 35,
     lowStockThreshold: 8,
     images: [
@@ -457,8 +457,8 @@ export const initialProducts: Product[] = [
     categoryId: 'cat-5',
     categoryName: 'Cosmetics & Beauty',
     subcategory: 'Skincare & Serums',
-    regularPrice: 110.00,
-    salePrice: 88.00,
+    regularPrice: 30580,
+    salePrice: 24464,
     stock: 22,
     lowStockThreshold: 4,
     images: [
@@ -479,7 +479,7 @@ export const initialProducts: Product[] = [
         name: 'Volume',
         options: [
           { label: '30ml / 1.0 fl oz', value: '30ml', stock: 14 },
-          { label: '50ml / 1.7 fl oz (Value Size)', value: '50ml', stock: 8, priceAdjustment: 35 },
+          { label: '50ml / 1.7 fl oz (Value Size)', value: '50ml', stock: 8, priceAdjustment: 9730 },
         ],
       },
     ],
@@ -511,7 +511,7 @@ export const initialProducts: Product[] = [
     categoryId: 'cat-5',
     categoryName: 'Cosmetics & Beauty',
     subcategory: 'Lipsticks & Glosses',
-    regularPrice: 38.00,
+    regularPrice: 10564,
     stock: 50,
     lowStockThreshold: 10,
     images: [
@@ -568,8 +568,8 @@ export const initialProducts: Product[] = [
     categoryId: 'cat-6',
     categoryName: 'Artificial Jewelry',
     subcategory: 'Necklaces & Pendants',
-    regularPrice: 175.00,
-    salePrice: 139.00,
+    regularPrice: 48650,
+    salePrice: 38642,
     stock: 18,
     lowStockThreshold: 4,
     images: [
@@ -625,7 +625,7 @@ export const initialProducts: Product[] = [
     categoryId: 'cat-6',
     categoryName: 'Artificial Jewelry',
     subcategory: 'Earrings & Studs',
-    regularPrice: 95.00,
+    regularPrice: 26410,
     stock: 25,
     lowStockThreshold: 5,
     images: [
@@ -680,7 +680,7 @@ export const initialProducts: Product[] = [
     categoryId: 'cat-7',
     categoryName: 'Luxury Fragrance & Living',
     subcategory: 'Aromatherapy Candles',
-    regularPrice: 55.00,
+    regularPrice: 15290,
     stock: 30,
     lowStockThreshold: 6,
     images: [
@@ -701,7 +701,7 @@ export const initialProducts: Product[] = [
         name: 'Size',
         options: [
           { label: '8 oz Single Wick', value: '8oz', stock: 18 },
-          { label: '16 oz Dual Wooden Wick', value: '16oz', stock: 12, priceAdjustment: 25 },
+          { label: '16 oz Dual Wooden Wick', value: '16oz', stock: 12, priceAdjustment: 6950 },
         ],
       },
     ],

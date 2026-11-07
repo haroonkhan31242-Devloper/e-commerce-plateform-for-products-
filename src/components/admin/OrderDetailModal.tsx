@@ -40,13 +40,13 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order: liveO
 
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
-  const [courierNameInput, setCourierNameInput] = useState(order?.courierName || 'FedEx Express');
+  const [courierNameInput, setCourierNameInput] = useState(order?.courierName || 'TCS Express');
   const [trackingNumberInput, setTrackingNumberInput] = useState(order?.trackingNumber || '');
   const [statusNoteInput, setStatusNoteInput] = useState('');
 
   useEffect(() => {
     if (!liveOrder) return;
-    setCourierNameInput(liveOrder.courierName || 'FedEx Express');
+    setCourierNameInput(liveOrder.courierName || 'TCS Express');
     setTrackingNumberInput(liveOrder.trackingNumber || '');
     setStatusNoteInput('');
     setRejectReason('');
@@ -328,7 +328,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order: liveO
                   type="text"
                   value={courierNameInput}
                   onChange={(e) => setCourierNameInput(e.target.value)}
-                  placeholder="e.g. FedEx Priority Overnight"
+                  placeholder="e.g. TCS Overnight"
                   className="w-full px-3 py-2 border border-neutral-300 rounded-xl bg-white"
                 />
               </div>
@@ -342,7 +342,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order: liveO
                   type="text"
                   value={trackingNumberInput}
                   onChange={(e) => setTrackingNumberInput(e.target.value)}
-                  placeholder="e.g. FDX-994827103US"
+                  placeholder="e.g. TCS-994827103"
                   className="w-full px-3 py-2 border border-neutral-300 rounded-xl bg-white font-mono"
                 />
               </div>

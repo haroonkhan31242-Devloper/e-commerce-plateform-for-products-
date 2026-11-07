@@ -16,7 +16,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
   onClose,
   productToEdit,
 }) => {
-  const { categories, products, addProduct, updateProduct, showToast, baseCurrency } = useStore();
+  const { categories, products, addProduct, updateProduct, showToast } = useStore();
 
   const [name, setName] = useState('');
   const [sku, setSku] = useState('');
@@ -297,13 +297,13 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                 <div className="grid grid-cols-2 gap-3 pt-2 border-t border-neutral-100">
                   <div>
                     <label htmlFor="product-form-modal-field-6" className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
-                      Regular Price ({baseCurrency}) *
+                      Regular Price (PKR) *
                     </label>
                     <input
                       id="product-form-modal-field-6"
                       type="number"
                       min="0"
-                      step="0.01"
+                      step="1"
                       value={regularPrice}
                       aria-invalid={!!errors.regularPrice}
                       onChange={(e) => setRegularPrice(Number(e.target.value))}
@@ -314,13 +314,13 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
 
                   <div>
                     <label htmlFor="product-form-modal-field-7" className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
-                      Sale Price ({baseCurrency})
+                      Sale Price (PKR)
                     </label>
                     <input
                       id="product-form-modal-field-7"
                       type="number"
                       min="0"
-                      step="0.01"
+                      step="1"
                       value={salePrice}
                       aria-invalid={!!errors.salePrice}
                       onChange={(e) => setSalePrice(e.target.value)}
@@ -466,7 +466,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                           <input
                             type="number"
                             min="0"
-                            step="0.01"
+                            step="1"
                             aria-label="Option extra price"
                             title="Extra price"
                             placeholder="+ Price"

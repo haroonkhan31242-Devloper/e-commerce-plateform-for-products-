@@ -6,7 +6,6 @@ import {
   Category,
   Order,
   Coupon,
-  Currency,
   StoreSettings,
   CartItem,
   CartItemVariationChoice,
@@ -26,13 +25,7 @@ import { initialStoreSettings } from '../data/storeSettings.ts';
 import { usePersistedState } from '../hooks/usePersistedState.ts';
 import { useToastActions } from './ToastContext.tsx';
 import { canHaveParcelLabel, createParcelLabel } from '../utils/parcelLabel.ts';
-import {
-  convertAmount,
-  ExchangeRates,
-  formatMoney,
-  getExchangeRates,
-  getMockExchangeRates,
-} from '../services/currencyService.ts';
+import { formatMoney } from '../services/currencyService.ts';
 import { loginAdmin } from '../services/storeApi.ts';
 import { appendTimelineEvent, calculateShipping } from '../utils/orders.ts';
 import {
@@ -96,11 +89,7 @@ interface StoreContextType {
   openQuickView: (product: Product) => void;
   closeQuickView: () => void;
 
-  // Pricing & Currency
-  currency: Currency;
-  setCurrency: (c: Currency) => void;
-  baseCurrency: Currency;
-  exchangeRates: ExchangeRates;
+  // Pricing
   formatPrice: (amount: number) => string;
   appliedCoupon: Coupon | null;
   applyCoupon: (code: string) => { success: boolean; message: string };
@@ -192,10 +181,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isWishlistDrawerOpen, setIsWishlistDrawerOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
 
-  // Currency & Coupon
-  const baseCurrency = storeSettings.currency;
-  const [currency, setCurrency] = usePersistedState<Currency>('aura_currency', baseCurrency);
-  const [exchangeRates, setExchangeRates] = useState(() => getMockExchangeRates(baseCurrency));
+  // Coupon
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
 
   // Authentication
@@ -212,18 +198,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const lastPlacedOrder = orders.find((o) => o.id === lastPlacedOrderId) ?? null;
   const [trackingOrderId, setTrackingOrderId] = useState<string | null>(null);
 
-
-  // Currency Formatter
-  useEffect(() => {
-    getExchangeRates(baseCurrency)
-      .then(setExchangeRates)
-      .catch((error: unknown) => {
-        console.error('Could not load exchange rates', error);
-        showToast('error', 'Live exchange rates are unavailable. Showing the last known rates.');
-      });
-  }, [baseCurrency]);
-
-  const formatPrice = (amount: number) => formatMoney(convertAmount(amount, currency, exchangeRates), currency);
 
   // Cart lines follow catalog edits: price and stock changes apply, deleted products drop out
   useEffect(() => {
@@ -249,7 +223,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (!appliedCoupon) return 0;
     if (cartSubtotal < appliedCoupon.minOrderAmount) return 0;
     if (appliedCoupon.type === 'percentage') {
-      return (cartSubtotal * appliedCoupon.value) / 100;
+      return Math.round((cartSubtotal * appliedCoupon.value) / 100);
     }
     return Math.min(appliedCoupon.value, cartSubtotal);
   }, [cartSubtotal, appliedCoupon]);
@@ -372,7 +346,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (cartSubtotal < found.minOrderAmount) {
       return {
         success: false,
-        message: `Minimum order amount of ${formatPrice(found.minOrderAmount)} required.`,
+        message: `Minimum order amount of ${formatMoney(found.minOrderAmount)} required.`,
       };
     }
 
@@ -778,11 +752,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         quickViewProduct,
         openQuickView,
         closeQuickView,
-        currency,
-        setCurrency,
-        baseCurrency,
-        exchangeRates,
-        formatPrice,
+        formatPrice: formatMoney,
         appliedCoupon,
         applyCoupon,
         removeCoupon,

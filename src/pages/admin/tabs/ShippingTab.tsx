@@ -9,7 +9,7 @@ interface ShippingTabProps {
 }
 
 export const ShippingTab: React.FC<ShippingTabProps> = ({ settingsForm, setSettingsForm }) => {
-  const { setStoreSettings, showToast, baseCurrency } = useStore();
+  const { setStoreSettings, showToast } = useStore();
 
   return (
     <AdminPanel
@@ -20,7 +20,7 @@ export const ShippingTab: React.FC<ShippingTabProps> = ({ settingsForm, setSetti
       <div className="space-y-4 text-xs">
         <div>
           <label htmlFor="shipping-tab-field-1" className="block font-bold text-neutral-700 uppercase tracking-wider mb-1">
-            Free Shipping Threshold ({baseCurrency})
+            Free Shipping Threshold (PKR)
           </label>
           <input
             id="shipping-tab-field-1"
@@ -40,7 +40,7 @@ export const ShippingTab: React.FC<ShippingTabProps> = ({ settingsForm, setSetti
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label htmlFor="shipping-tab-field-2" className="block font-bold text-neutral-700 uppercase tracking-wider mb-1">
-              Standard Fee ({baseCurrency})
+              Standard Fee (PKR)
             </label>
             <input
               id="shipping-tab-field-2"
@@ -56,7 +56,7 @@ export const ShippingTab: React.FC<ShippingTabProps> = ({ settingsForm, setSetti
 
           <div>
             <label htmlFor="shipping-tab-field-3" className="block font-bold text-neutral-700 uppercase tracking-wider mb-1">
-              Express Fee ({baseCurrency})
+              Express Fee (PKR)
             </label>
             <input
               id="shipping-tab-field-3"

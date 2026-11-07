@@ -11,6 +11,7 @@ import {
   Lock,
   Loader2,
 } from 'lucide-react';
+import { STORE_COUNTRY } from '../../data/storeSettings.ts';
 import { useStore } from '../../context/StoreContext.tsx';
 import { PaymentMethod, DeliveryInfo, CustomerInfo } from '../../types/index.ts';
 import { submitOrder } from '../../services/storeApi.ts';
@@ -50,9 +51,6 @@ export const CheckoutPage: React.FC = () => {
     customerUser,
     placeOrder,
     browseAllProducts,
-    currency,
-    baseCurrency,
-    exchangeRates,
   } = useStore();
 
   const [currentStep, setCurrentStep] = useState<CheckoutStep>(1);
@@ -64,7 +62,6 @@ export const CheckoutPage: React.FC = () => {
 
   // Step 2: Delivery Info
   const savedAddress = customerUser?.savedAddresses[0];
-  const [country, setCountry] = useState(savedAddress?.country ?? 'United States');
   const [city, setCity] = useState(savedAddress?.city ?? '');
   const [address, setAddress] = useState(savedAddress?.address ?? '');
   const [postalCode, setPostalCode] = useState(savedAddress?.postalCode ?? '');
@@ -172,7 +169,7 @@ export const CheckoutPage: React.FC = () => {
     };
 
     const deliveryInfo: DeliveryInfo = {
-      country,
+      country: STORE_COUNTRY,
       city,
       address,
       postalCode,
@@ -321,7 +318,7 @@ export const CheckoutPage: React.FC = () => {
                       autoComplete="tel"
                       aria-invalid={!!errors.phone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
-                      placeholder="e.g. +1 (555) 349-8821"
+                      placeholder="e.g. +92 300 1234567"
                       className="w-full px-4 py-2.5 text-xs border border-neutral-300 rounded-xl focus:outline-none focus:border-neutral-900"
                     />
                     {errors.phone && <p role="alert" className="text-xs text-rose-700 mt-1">{errors.phone}</p>}
@@ -367,19 +364,14 @@ export const CheckoutPage: React.FC = () => {
                     <label htmlFor="checkout-page-field-4" className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
                       Country
                     </label>
-                    <select
+                    <input
                       id="checkout-page-field-4"
-                      value={country}
-                      onChange={(e) => setCountry(e.target.value)}
-                      className="w-full px-4 py-2.5 text-xs border border-neutral-300 rounded-xl focus:outline-none focus:border-neutral-900 bg-white"
-                    >
-                      <option value="United States">United States</option>
-                      <option value="United Kingdom">United Kingdom</option>
-                      <option value="Canada">Canada</option>
-                      <option value="Germany">Germany</option>
-                      <option value="France">France</option>
-                      <option value="United Arab Emirates">United Arab Emirates</option>
-                    </select>
+                      type="text"
+                      value={STORE_COUNTRY}
+                      readOnly
+                      autoComplete="country-name"
+                      className="w-full px-4 py-2.5 text-xs border border-neutral-200 rounded-xl bg-neutral-100 text-neutral-700 focus:outline-none cursor-default"
+                    />
                   </div>
 
                   <div>
@@ -393,7 +385,7 @@ export const CheckoutPage: React.FC = () => {
                       autoComplete="address-level2"
                       aria-invalid={!!errors.city}
                       onChange={(e) => setCity(e.target.value)}
-                      placeholder="e.g. New York"
+                      placeholder="e.g. Karachi"
                       className="w-full px-4 py-2.5 text-xs border border-neutral-300 rounded-xl focus:outline-none focus:border-neutral-900"
                     />
                     {errors.city && <p role="alert" className="text-xs text-rose-700 mt-1">{errors.city}</p>}
@@ -411,7 +403,7 @@ export const CheckoutPage: React.FC = () => {
                     autoComplete="street-address"
                     aria-invalid={!!errors.address}
                     onChange={(e) => setAddress(e.target.value)}
-                    placeholder="e.g. 742 Evergreen Terrace, Apt 14B"
+                    placeholder="e.g. House 14-B, Street 7, DHA Phase 6"
                     className="w-full px-4 py-2.5 text-xs border border-neutral-300 rounded-xl focus:outline-none focus:border-neutral-900"
                   />
                   {errors.address && <p role="alert" className="text-xs text-rose-700 mt-1">{errors.address}</p>}
@@ -429,7 +421,7 @@ export const CheckoutPage: React.FC = () => {
                       autoComplete="postal-code"
                       aria-invalid={!!errors.postalCode}
                       onChange={(e) => setPostalCode(e.target.value)}
-                      placeholder="e.g. 10021"
+                      placeholder="e.g. 75500"
                       className="w-full px-4 py-2.5 text-xs border border-neutral-300 rounded-xl focus:outline-none focus:border-neutral-900"
                     />
                     {errors.postalCode && <p role="alert" className="text-xs text-rose-700 mt-1">{errors.postalCode}</p>}
@@ -563,7 +555,7 @@ export const CheckoutPage: React.FC = () => {
               <div className="p-4 bg-neutral-50 rounded-2xl border border-neutral-200/80 text-xs space-y-1">
                 <p className="font-bold text-neutral-900">Delivering to:</p>
                 <p className="text-neutral-700">{customerName} ({customerPhone})</p>
-                <p className="text-neutral-600">{address}, {city}, {postalCode}, {country}</p>
+                <p className="text-neutral-600">{address}, {city}, {postalCode}, {STORE_COUNTRY}</p>
                 <p className="text-neutral-500 text-xs">
                   Shipping: {shippingOption === 'express' ? 'Priority Air Express (1-2 Days)' : 'Standard Ground (3-5 Days)'}
                 </p>
@@ -661,7 +653,7 @@ export const CheckoutPage: React.FC = () => {
                           value={bankWireReference}
                           aria-invalid={!!errors.bankRef}
                           onChange={(e) => setBankWireReference(e.target.value)}
-                          placeholder="e.g. WIRE-US-9988231 or Bank Slip Reference"
+                          placeholder="e.g. WIRE-9988231 or Bank Slip Reference"
                           className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-xl focus:outline-none focus:border-neutral-900 font-mono"
                         />
                         {errors.bankRef && <p role="alert" className="text-xs text-rose-700 mt-1">{errors.bankRef}</p>}
@@ -843,13 +835,6 @@ export const CheckoutPage: React.FC = () => {
               <span className="text-amber-900">{formatPrice(finalGrandTotal)}</span>
             </div>
           </div>
-
-          {currency !== baseCurrency && (
-            <p className="p-3 bg-neutral-50 border border-neutral-200 rounded-xl text-xs text-neutral-600">
-              Prices are shown in {currency}
-              {exchangeRates.source === 'mock' ? ' using demo exchange rates' : ''}. Your order is recorded in {baseCurrency}.
-            </p>
-          )}
 
           <div className="pt-2 text-xs text-neutral-500 space-y-2 border-t border-neutral-100">
             <div className="flex items-center gap-2">

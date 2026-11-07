@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { User, ShoppingBag, MapPin, LogOut, ArrowRight, Trash2, Plus } from 'lucide-react';
+import { STORE_COUNTRY } from '../../data/storeSettings.ts';
 import { useStore } from '../../context/StoreContext.tsx';
 import { StatusBadge } from '../../components/common/StatusBadge.tsx';
 import { EmptyState } from '../../components/common/EmptyState.tsx';
@@ -13,7 +14,7 @@ const inputClasses =
   'w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:border-neutral-900 bg-white';
 const labelClasses = 'block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1';
 
-const EMPTY_ADDRESS = { country: 'United States', city: '', address: '', postalCode: '' };
+const EMPTY_ADDRESS = { country: STORE_COUNTRY, city: '', address: '', postalCode: '' };
 
 export const CustomerAccountPage: React.FC = () => {
   const {

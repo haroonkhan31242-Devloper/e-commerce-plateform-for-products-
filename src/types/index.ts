@@ -22,26 +22,6 @@ export type AdminTab =
   | 'reviews'
   | 'settings';
 
-export type Currency =
-  | 'USD'
-  | 'EUR'
-  | 'GBP'
-  | 'PKR'
-  | 'INR'
-  | 'AED'
-  | 'SAR'
-  | 'CNY'
-  | 'JPY'
-  | 'CAD'
-  | 'AUD'
-  | 'CHF'
-  | 'TRY'
-  | 'BDT'
-  | 'MYR'
-  | 'KWD'
-  | 'QAR'
-  | 'OMR';
-
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
 export interface ToastState {
@@ -214,7 +194,7 @@ export interface Coupon {
   id: string;
   code: string;
   type: 'percentage' | 'fixed';
-  value: number; // e.g. 20 for 20% or 15 for 15 in the base currency
+  value: number; // e.g. 20 for 20% or 500 for Rs 500
   minOrderAmount: number;
   expiryDate: string;
   usageCount: number;
@@ -230,7 +210,6 @@ export interface StoreSettings {
   contactEmail: string;
   contactPhone: string;
   address: string;
-  currency: Currency; // Base currency that all stored prices are in
   freeShippingThreshold: number;
   standardShippingFee: number;
   expressShippingFee: number;

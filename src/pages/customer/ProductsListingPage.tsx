@@ -206,7 +206,7 @@ export const ProductsListingPage: React.FC = () => {
         <div className="pt-4 border-t border-neutral-100">
           <div className="flex items-center justify-between text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2">
             <span>Max Price</span>
-            <span className="text-amber-900 font-mono">{formatPrice(priceLimit)}</span>
+            <span className="text-amber-900 font-mono normal-case">{formatPrice(priceLimit)}</span>
           </div>
           <input
             type="range"

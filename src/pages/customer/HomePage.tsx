@@ -219,7 +219,7 @@ export const HomePage: React.FC = () => {
               Seasonal Offer
             </span>
             <h3 className="font-serif text-2xl sm:text-3xl font-bold text-neutral-900">
-              Save 20% on Orders Over {formatPrice(100)}
+              Save 20% on Orders Over {formatPrice(27800)}
             </h3>
             <p className="text-sm text-neutral-600 max-w-xl">
               Valid storewide across fashion, wellness, cosmetics, and jewelry.
