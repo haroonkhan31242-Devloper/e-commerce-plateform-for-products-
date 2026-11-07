@@ -5,7 +5,6 @@ import { useStore } from '../../context/StoreContext.tsx';
 import { sizedImage } from '../../utils/images.ts';
 import { EmptyState } from '../../components/common/EmptyState.tsx';
 import { QuantityStepper } from '../../components/common/QuantityStepper.tsx';
-import { CouponField } from '../../components/customer/CouponField.tsx';
 import { getAvailableStock } from '../../utils/product.ts';
 
 export const CartPage: React.FC = () => {
@@ -14,7 +13,6 @@ export const CartPage: React.FC = () => {
     updateCartQuantity,
     removeFromCart,
     cartSubtotal,
-    cartDiscount,
     cartShipping,
     cartGrandTotal,
     formatPrice,
@@ -125,7 +123,7 @@ export const CartPage: React.FC = () => {
                     <p className="text-xs text-neutral-600 mt-0.5">{formatPrice(item.unitPrice)} each</p>
                   </div>
 
-                  <div className="flex items-center justify-between sm:justify-end gap-3">
+                  <div className="flex flex-wrap items-center justify-between sm:justify-end gap-x-3 gap-y-1">
                     <QuantityStepper
                       size="sm"
                       label={`Quantity of ${item.product.name}`}
@@ -134,16 +132,18 @@ export const CartPage: React.FC = () => {
                       max={getAvailableStock(item.product, item.selectedVariations)}
                       onChange={(qty) => updateCartQuantity(item.id, qty)}
                     />
-                    <span className="text-sm font-bold text-neutral-900 min-w-16 text-right">
-                      {formatPrice(item.unitPrice * item.quantity)}
-                    </span>
-                    <button
-                      onClick={() => removeFromCart(item.id)}
-                      aria-label={`Remove ${item.product.name}`}
-                      className="p-2 text-neutral-500 hover:text-rose-700"
-                    >
-                      <Trash2 className="w-4 h-4" aria-hidden="true" />
-                    </button>
+                    <div className="flex items-center gap-3 ml-auto sm:ml-0">
+                      <span className="text-sm font-bold text-neutral-900 min-w-16 text-right whitespace-nowrap">
+                        {formatPrice(item.unitPrice * item.quantity)}
+                      </span>
+                      <button
+                        onClick={() => removeFromCart(item.id)}
+                        aria-label={`Remove ${item.product.name}`}
+                        className="p-2 text-neutral-500 hover:text-rose-700"
+                      >
+                        <Trash2 className="w-4 h-4" aria-hidden="true" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </m.div>
@@ -157,19 +157,11 @@ export const CartPage: React.FC = () => {
             Order Summary
           </h2>
 
-          <CouponField />
-
-          <dl className="space-y-2.5 text-sm text-neutral-600 pt-3 border-t border-neutral-100">
+          <dl className="space-y-2.5 text-sm text-neutral-600">
             <div className="flex justify-between">
               <dt>Subtotal</dt>
               <dd className="font-semibold text-neutral-900">{formatPrice(cartSubtotal)}</dd>
             </div>
-            {cartDiscount > 0 && (
-              <div className="flex justify-between text-emerald-800">
-                <dt>Coupon discount</dt>
-                <dd className="font-semibold">-{formatPrice(cartDiscount)}</dd>
-              </div>
-            )}
             <div className="flex justify-between">
               <dt>Estimated shipping</dt>
               <dd className="font-semibold text-neutral-900">

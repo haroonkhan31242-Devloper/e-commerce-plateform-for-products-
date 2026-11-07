@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AnimatePresence, m } from 'motion/react';
-import { Sparkles, ArrowRight, ChevronRight, Tag, Check } from 'lucide-react';
+import { Sparkles, ArrowRight, ChevronRight } from 'lucide-react';
 import { useStore } from '../../context/StoreContext.tsx';
 import { ProductCard } from '../../components/customer/ProductCard.tsx';
 import { StarRating } from '../../components/common/StarRating.tsx';
@@ -48,26 +48,12 @@ export const HomePage: React.FC = () => {
     categories,
     navigateToCategory,
     browseAllProducts,
-    formatPrice,
-    showToast,
   } = useStore();
 
   const [activeSlide, setActiveSlide] = useState(0);
-  const [copiedCoupon, setCopiedCoupon] = useState(false);
 
   const bestSellers = products.filter((p) => p.isBestSeller && p.status === 'active');
   const newArrivals = products.filter((p) => p.isNewArrival && p.status === 'active');
-
-  const copyCouponCode = async (code: string) => {
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopiedCoupon(true);
-      showToast('success', `Copied coupon code "${code}".`);
-      setTimeout(() => setCopiedCoupon(false), 3000);
-    } catch {
-      showToast('error', `Could not copy automatically. The code is ${code}.`);
-    }
-  };
 
   const currentHero = HERO_SLIDES[activeSlide];
 
@@ -208,38 +194,6 @@ export const HomePage: React.FC = () => {
           {bestSellers.slice(0, 8).map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
-        </div>
-      </Reveal>
-
-      {/* Special Promotional Offer Banner */}
-      <Reveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-amber-50 border border-amber-200 rounded-3xl p-8 sm:p-10 flex flex-col lg:flex-row items-center justify-between gap-6 shadow-sm">
-          <div className="space-y-2 text-center lg:text-left">
-            <span className="px-3 py-1 bg-amber-200/60 text-amber-900 text-xs font-bold rounded-full uppercase tracking-wider">
-              Seasonal Offer
-            </span>
-            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-neutral-900">
-              Save 20% on Orders Over {formatPrice(27800)}
-            </h3>
-            <p className="text-sm text-neutral-600 max-w-xl">
-              Valid storewide across fashion, wellness, cosmetics, and jewelry.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-3 bg-white p-3 rounded-2xl border border-amber-300 shrink-0">
-            <div className="px-4 py-2 border-2 border-dashed border-neutral-900 rounded-xl bg-amber-50/50">
-              <span className="font-mono text-base font-bold text-neutral-900 tracking-wider">
-                STEROSE20
-              </span>
-            </div>
-            <button
-              onClick={() => copyCouponCode('STEROSE20')}
-              className="px-4 py-2 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl transition-colors flex items-center gap-1.5"
-            >
-              {copiedCoupon ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Tag className="w-3.5 h-3.5" />}
-              <span>{copiedCoupon ? 'Copied' : 'Copy Code'}</span>
-            </button>
-          </div>
         </div>
       </Reveal>
 

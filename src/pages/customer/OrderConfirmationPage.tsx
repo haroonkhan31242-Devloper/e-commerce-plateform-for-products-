@@ -109,7 +109,7 @@ export const OrderConfirmationPage: React.FC = () => {
             </div>
             {order.discountAmount > 0 && (
               <div className="flex justify-between text-emerald-700">
-                <span>Discount ({order.appliedCouponCode})</span>
+                <span>Discount</span>
                 <span className="font-semibold">-{formatPrice(order.discountAmount)}</span>
               </div>
             )}

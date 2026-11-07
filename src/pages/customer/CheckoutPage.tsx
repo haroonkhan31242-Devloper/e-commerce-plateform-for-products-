@@ -43,11 +43,9 @@ export const CheckoutPage: React.FC = () => {
   const {
     cart,
     cartSubtotal,
-    cartDiscount,
     getShippingCost,
     formatPrice,
     storeSettings,
-    appliedCoupon,
     customerUser,
     placeOrder,
     browseAllProducts,
@@ -95,7 +93,7 @@ export const CheckoutPage: React.FC = () => {
 
   const effectiveShipping = getShippingCost(shippingOption);
 
-  const finalGrandTotal = Math.max(0, cartSubtotal - cartDiscount + effectiveShipping);
+  const finalGrandTotal = Math.max(0, cartSubtotal + effectiveShipping);
 
   const showErrors = (errs: Record<string, string>) => {
     setErrors(errs);
@@ -196,8 +194,7 @@ export const CheckoutPage: React.FC = () => {
         delivery: deliveryInfo,
         items: orderItems,
         subtotal: cartSubtotal,
-        discountAmount: cartDiscount,
-        appliedCouponCode: appliedCoupon?.code,
+        discountAmount: 0,
         shippingCharge: effectiveShipping,
         grandTotal: finalGrandTotal,
         paymentMethod,
@@ -815,13 +812,6 @@ export const CheckoutPage: React.FC = () => {
               <span>Items Total ({cart.reduce((s, i) => s + i.quantity, 0)})</span>
               <span className="font-semibold text-neutral-900">{formatPrice(cartSubtotal)}</span>
             </div>
-
-            {cartDiscount > 0 && (
-              <div className="flex justify-between text-emerald-700">
-                <span>Coupon Applied</span>
-                <span className="font-semibold">-{formatPrice(cartDiscount)}</span>
-              </div>
-            )}
 
             <div className="flex justify-between">
               <span>Shipping Charge</span>

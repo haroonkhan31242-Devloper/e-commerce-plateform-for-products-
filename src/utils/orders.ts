@@ -1,5 +1,4 @@
 import {
-  Coupon,
   DeliveryInfo,
   Order,
   OrderStatus,
@@ -29,11 +28,10 @@ export const appendTimelineEvent = (
 export const calculateShipping = (
   subtotal: number,
   option: DeliveryInfo['shippingOption'],
-  settings: StoreSettings,
-  coupon: Coupon | null
+  settings: StoreSettings
 ): number => {
   if (subtotal === 0) return 0;
-  if (coupon?.code === 'FREESHIP' || subtotal >= settings.freeShippingThreshold) return 0;
+  if (subtotal >= settings.freeShippingThreshold) return 0;
   return option === 'express' ? settings.expressShippingFee : settings.standardShippingFee;
 };
 

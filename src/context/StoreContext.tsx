@@ -5,7 +5,6 @@ import {
   Product,
   Category,
   Order,
-  Coupon,
   StoreSettings,
   CartItem,
   CartItemVariationChoice,
@@ -20,7 +19,6 @@ import { initialCategories } from '../data/initialCategories.ts';
 import { createDemoCustomerProfile, initialCustomerProfile } from '../data/initialCustomers.ts';
 import { initialProducts } from '../data/initialProducts.ts';
 import { initialOrders } from '../data/initialOrders.ts';
-import { initialCoupons } from '../data/initialCoupons.ts';
 import { initialStoreSettings } from '../data/storeSettings.ts';
 import { usePersistedState } from '../hooks/usePersistedState.ts';
 import { useToastActions } from './ToastContext.tsx';
@@ -62,7 +60,6 @@ interface StoreContextType {
   products: Product[];
   categories: Category[];
   orders: Order[];
-  coupons: Coupon[];
   storeSettings: StoreSettings;
   setStoreSettings: React.Dispatch<React.SetStateAction<StoreSettings>>;
 
@@ -91,11 +88,7 @@ interface StoreContextType {
 
   // Pricing
   formatPrice: (amount: number) => string;
-  appliedCoupon: Coupon | null;
-  applyCoupon: (code: string) => { success: boolean; message: string };
-  removeCoupon: () => void;
   cartSubtotal: number;
-  cartDiscount: number;
   cartShipping: number;
   cartGrandTotal: number;
   cartItemCount: number;
@@ -126,10 +119,6 @@ interface StoreContextType {
   updateCategory: (id: string, updates: Partial<Category>) => void;
   deleteCategory: (id: string) => boolean;
 
-  // Coupon CRUD (Admin)
-  addCoupon: (coupon: Omit<Coupon, 'id' | 'usageCount'>) => Coupon;
-  updateCoupon: (id: string, updates: Partial<Coupon>) => void;
-  deleteCoupon: (id: string) => void;
 
   // Reviews CRUD
   addProductReview: (productId: string, review: Omit<Review, 'id' | 'date' | 'isApproved'>) => void;
@@ -169,7 +158,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   );
   const [categories, setCategories] = usePersistedState<Category[]>('aura_categories', initialCategories);
   const [orders, setOrders] = usePersistedState<Order[]>('aura_orders', initialOrders);
-  const [coupons, setCoupons] = usePersistedState<Coupon[]>('aura_coupons', initialCoupons);
   const [storeSettings, setStoreSettings] = usePersistedState<StoreSettings>('aura_settings', initialStoreSettings);
 
   // Cart & Wishlist
@@ -181,8 +169,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isWishlistDrawerOpen, setIsWishlistDrawerOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
 
-  // Coupon
-  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
 
   // Authentication
   const [scannedParcelId, setScannedParcelId] = useState<string | null>(null);
@@ -219,24 +205,15 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return cart.reduce((acc, item) => acc + item.unitPrice * item.quantity, 0);
   }, [cart]);
 
-  const cartDiscount = useMemo(() => {
-    if (!appliedCoupon) return 0;
-    if (cartSubtotal < appliedCoupon.minOrderAmount) return 0;
-    if (appliedCoupon.type === 'percentage') {
-      return Math.round((cartSubtotal * appliedCoupon.value) / 100);
-    }
-    return Math.min(appliedCoupon.value, cartSubtotal);
-  }, [cartSubtotal, appliedCoupon]);
-
   const getShippingCost = (option: DeliveryInfo['shippingOption']) =>
-    calculateShipping(cartSubtotal, option, storeSettings, appliedCoupon);
+    calculateShipping(cartSubtotal, option, storeSettings);
 
   const cartShipping = getShippingCost('standard');
 
   const cartGrandTotal = useMemo(() => {
-    const total = cartSubtotal - cartDiscount + cartShipping;
+    const total = cartSubtotal + cartShipping;
     return Math.max(0, total);
-  }, [cartSubtotal, cartDiscount, cartShipping]);
+  }, [cartSubtotal, cartShipping]);
 
   const cartItemCount = useMemo(() => {
     return cart.reduce((acc, item) => acc + item.quantity, 0);
@@ -327,39 +304,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     showToast('info', 'Item removed from shopping cart.');
   };
 
-  // Coupon Actions
-  const applyCoupon = (code: string) => {
-    const trimmed = code.trim().toUpperCase();
-    const found = coupons.find((c) => c.code.toUpperCase() === trimmed);
-    if (!found) {
-      return { success: false, message: 'Invalid promotional coupon code.' };
-    }
-    if (!found.isActive) {
-      return { success: false, message: 'This coupon has been deactivated.' };
-    }
-    if (new Date(found.expiryDate) < new Date()) {
-      return { success: false, message: 'This coupon has expired.' };
-    }
-    if (found.maxUsage !== undefined && found.usageCount >= found.maxUsage) {
-      return { success: false, message: 'This coupon has reached its redemption limit.' };
-    }
-    if (cartSubtotal < found.minOrderAmount) {
-      return {
-        success: false,
-        message: `Minimum order amount of ${formatMoney(found.minOrderAmount)} required.`,
-      };
-    }
-
-    setAppliedCoupon(found);
-    showToast('success', `Coupon "${found.code}" applied successfully!`);
-    return { success: true, message: `Coupon applied: ${found.description}` };
-  };
-
-  const removeCoupon = () => {
-    setAppliedCoupon(null);
-    showToast('info', 'Coupon removed.');
-  };
-
   // Navigation helpers
   const navigateToProduct = (productId: string) => {
     setSelectedProductId(productId);
@@ -426,16 +370,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       )
     );
 
-    if (payload.appliedCouponCode) {
-      setCoupons((prev) =>
-        prev.map((c) => (c.code === payload.appliedCouponCode ? { ...c, usageCount: c.usageCount + 1 } : c))
-      );
-    }
-
     setOrders((prev) => [newOrder, ...prev]);
     setLastPlacedOrderId(newOrder.id);
     setCart([]);
-    setAppliedCoupon(null);
     setCurrentView('order-confirmation');
     showToast('success', `Order ${orderNumber} placed successfully!`);
     return newOrder;
@@ -620,28 +557,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return true;
   };
 
-  // Coupon CRUD
-  const addCoupon = (couponData: Omit<Coupon, 'id' | 'usageCount'>): Coupon => {
-    const newC: Coupon = {
-      ...couponData,
-      id: `coup-${Date.now()}`,
-      usageCount: 0,
-    };
-    setCoupons((prev) => [newC, ...prev]);
-    showToast('success', `Coupon "${newC.code}" created!`);
-    return newC;
-  };
-
-  const updateCoupon = (id: string, updates: Partial<Coupon>) => {
-    setCoupons((prev) => prev.map((c) => (c.id === id ? { ...c, ...updates } : c)));
-    showToast('success', 'Coupon settings updated.');
-  };
-
-  const deleteCoupon = (id: string) => {
-    setCoupons((prev) => prev.filter((c) => c.id !== id));
-    showToast('info', 'Coupon removed.');
-  };
-
   // Reviews Moderation
   const withReviews = (product: Product, reviews: Review[]): Product => ({
     ...product,
@@ -735,7 +650,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         products,
         categories,
         orders,
-        coupons,
         storeSettings,
         setStoreSettings,
         cart,
@@ -753,11 +667,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         openQuickView,
         closeQuickView,
         formatPrice: formatMoney,
-        appliedCoupon,
-        applyCoupon,
-        removeCoupon,
         cartSubtotal,
-        cartDiscount,
         cartShipping,
         cartGrandTotal,
         cartItemCount,
@@ -781,9 +691,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         addCategory,
         updateCategory,
         deleteCategory,
-        addCoupon,
-        updateCoupon,
-        deleteCoupon,
         addProductReview,
         moderateReview,
         deleteReview,

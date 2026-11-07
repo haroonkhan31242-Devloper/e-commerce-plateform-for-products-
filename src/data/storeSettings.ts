@@ -21,6 +21,6 @@ export const initialStoreSettings: StoreSettings = {
     swiftCode: 'CHASUS33XXX',
     instructions: 'Please transfer the exact invoice grand total within 48 hours. Enter your Order Number as the transfer memo / reference, then enter your Wire Reference Code in the order tracking or payment portal.',
   },
-  announcementText: 'Complimentary Express Shipping on all orders over {freeShipping} | Use code STEROSE20 for 20% off',
+  announcementText: 'Complimentary Express Shipping on all orders over {freeShipping}',
   isAnnouncementActive: true,
 };

@@ -7,7 +7,6 @@ import { Drawer } from '../common/Overlay.tsx';
 import { EmptyState } from '../common/EmptyState.tsx';
 import { QuantityStepper } from '../common/QuantityStepper.tsx';
 import { getAvailableStock } from '../../utils/product.ts';
-import { CouponField } from './CouponField.tsx';
 
 export const CartDrawer: React.FC = () => {
   const {
@@ -18,7 +17,6 @@ export const CartDrawer: React.FC = () => {
     updateCartQuantity,
     removeFromCart,
     cartSubtotal,
-    cartDiscount,
     cartShipping,
     cartGrandTotal,
     formatPrice,
@@ -168,19 +166,11 @@ export const CartDrawer: React.FC = () => {
       {/* Footer & Checkout Area */}
       {cart.length > 0 && (
         <div className="p-5 border-t border-neutral-200 bg-neutral-50 space-y-3 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
-          <CouponField />
-
-          <dl className="space-y-1.5 text-sm text-neutral-600 pt-2 border-t border-neutral-200">
+          <dl className="space-y-1.5 text-sm text-neutral-600">
             <div className="flex justify-between">
               <dt>Subtotal</dt>
               <dd className="font-semibold text-neutral-900">{formatPrice(cartSubtotal)}</dd>
             </div>
-            {cartDiscount > 0 && (
-              <div className="flex justify-between text-emerald-800">
-                <dt>Coupon discount</dt>
-                <dd className="font-semibold">-{formatPrice(cartDiscount)}</dd>
-              </div>
-            )}
             <div className="flex justify-between">
               <dt>Estimated shipping</dt>
               <dd className="font-semibold text-neutral-900">

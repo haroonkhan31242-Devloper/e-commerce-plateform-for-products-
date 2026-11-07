@@ -1,7 +1,7 @@
 import { initialCustomerProfile } from '../data/initialCustomers.ts';
 import { initialOrders } from '../data/initialOrders.ts';
 import { STORE_COUNTRY } from '../data/storeSettings.ts';
-import { Coupon, CustomerProfile, DeliveryInfo, Order, Product, StoreSettings } from '../types/index.ts';
+import { CustomerProfile, DeliveryInfo, Order, Product, StoreSettings } from '../types/index.ts';
 
 const MIGRATION_FLAG = 'aura_pkr_migrated';
 
@@ -55,16 +55,6 @@ const migrateOrder = (order: Order): Order => {
   };
 };
 
-const migrateCoupon = (coupon: Coupon): Coupon => ({
-  ...coupon,
-  value: coupon.type === 'fixed' ? toPkr(coupon.value) : coupon.value,
-  minOrderAmount: toPkr(coupon.minOrderAmount),
-  description: coupon.description.replace(
-    /\$(\d+(?:\.\d+)?)/g,
-    (_, usd: string) => `Rs ${toPkr(Number(usd)).toLocaleString('en-US')}`
-  ),
-});
-
 const migrateSettings = ({ currency: _currency, ...settings }: StoreSettings & { currency?: string }): StoreSettings => ({
   ...settings,
   freeShippingThreshold: toPkr(settings.freeShippingThreshold),
@@ -101,13 +91,11 @@ export const migrateStoredToPkr = () => {
     const updates: Record<string, unknown> = {};
     const products = readJson<Product[]>('aura_products');
     const orders = readJson<Order[]>('aura_orders');
-    const coupons = readJson<Coupon[]>('aura_coupons');
     const settings = readJson<StoreSettings>('aura_settings');
     const customer = readJson<CustomerProfile>('aura_customer');
 
     if (products) updates.aura_products = products.map(migrateProduct);
     if (orders) updates.aura_orders = orders.map(migrateOrder);
-    if (coupons) updates.aura_coupons = coupons.map(migrateCoupon);
     if (settings) updates.aura_settings = migrateSettings(settings);
     if (customer) updates.aura_customer = migrateCustomer(customer);
 

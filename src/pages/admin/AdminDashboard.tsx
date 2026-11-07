@@ -6,8 +6,7 @@ import { AdminSidebar } from '../../components/admin/AdminSidebar.tsx';
 import { ProductFormModal } from '../../components/admin/ProductFormModal.tsx';
 import { CategoryFormModal } from '../../components/admin/CategoryFormModal.tsx';
 import { OrderDetailModal } from '../../components/admin/OrderDetailModal.tsx';
-import { CouponFormModal } from '../../components/admin/CouponFormModal.tsx';
-import { Product, Category, Order, Coupon } from '../../types/index.ts';
+import { Product, Category, Order } from '../../types/index.ts';
 import { AdminLoginScreen } from './AdminLoginScreen.tsx';
 import { OverviewTab } from './tabs/OverviewTab.tsx';
 import { OrdersTab } from './tabs/OrdersTab.tsx';
@@ -16,7 +15,6 @@ import { CategoriesTab } from './tabs/CategoriesTab.tsx';
 import { InventoryTab } from './tabs/InventoryTab.tsx';
 import { CustomersTab } from './tabs/CustomersTab.tsx';
 import { PaymentsTab } from './tabs/PaymentsTab.tsx';
-import { CouponsTab } from './tabs/CouponsTab.tsx';
 import { ReviewsTab } from './tabs/ReviewsTab.tsx';
 import { ShippingTab } from './tabs/ShippingTab.tsx';
 import { SettingsTab } from './tabs/SettingsTab.tsx';
@@ -45,8 +43,6 @@ export const AdminDashboard: React.FC = () => {
 
   const [orderIdToInspect, setOrderIdToInspect] = useState<string | null>(null);
 
-  const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
-  const [couponToEdit, setCouponToEdit] = useState<Coupon | null>(null);
 
   // Tab state kept here so filters and unsaved forms survive switching tabs
   const [orderStatusFilter, setOrderStatusFilter] = useState<string>('All');
@@ -80,11 +76,6 @@ export const AdminDashboard: React.FC = () => {
   const openCategoryModal = (category: Category | null) => {
     setCategoryToEdit(category);
     setIsCategoryModalOpen(true);
-  };
-
-  const openCouponModal = (coupon: Coupon | null) => {
-    setCouponToEdit(coupon);
-    setIsCouponModalOpen(true);
   };
 
   const inspectOrder = (order: Order) => setOrderIdToInspect(order.id);
@@ -157,7 +148,6 @@ export const AdminDashboard: React.FC = () => {
           {adminTab === 'inventory' && <InventoryTab />}
           {adminTab === 'customers' && <CustomersTab />}
           {adminTab === 'payments' && <PaymentsTab onInspectOrder={inspectOrder} />}
-          {adminTab === 'coupons' && <CouponsTab onEditCoupon={openCouponModal} />}
           {adminTab === 'reviews' && <ReviewsTab />}
           {adminTab === 'shipping' && (
             <ShippingTab settingsForm={settingsForm} setSettingsForm={setSettingsForm} />
@@ -184,12 +174,6 @@ export const AdminDashboard: React.FC = () => {
       <OrderDetailModal
         order={orderToInspect}
         onClose={() => setOrderIdToInspect(null)}
-      />
-
-      <CouponFormModal
-        isOpen={isCouponModalOpen}
-        onClose={() => setIsCouponModalOpen(false)}
-        couponToEdit={couponToEdit}
       />
     </div>
   );

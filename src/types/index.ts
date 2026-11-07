@@ -17,7 +17,6 @@ export type AdminTab =
   | 'inventory'
   | 'customers'
   | 'payments'
-  | 'coupons'
   | 'shipping'
   | 'reviews'
   | 'settings';
@@ -176,7 +175,6 @@ export interface Order {
   items: OrderItem[];
   subtotal: number;
   discountAmount: number;
-  appliedCouponCode?: string;
   shippingCharge: number;
   grandTotal: number;
   paymentMethod: PaymentMethod;
@@ -188,19 +186,6 @@ export interface Order {
   courierName?: string;
   parcelLabel?: ParcelLabel;
   timeline: TimelineEvent[];
-}
-
-export interface Coupon {
-  id: string;
-  code: string;
-  type: 'percentage' | 'fixed';
-  value: number; // e.g. 20 for 20% or 500 for Rs 500
-  minOrderAmount: number;
-  expiryDate: string;
-  usageCount: number;
-  maxUsage?: number;
-  isActive: boolean;
-  description: string;
 }
 
 export interface StoreSettings {

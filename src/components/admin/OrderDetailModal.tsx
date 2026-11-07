@@ -299,7 +299,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order: liveO
             <div className="p-3 bg-neutral-50 border-t border-neutral-200 text-right space-y-1">
               {order.discountAmount > 0 && (
                 <p className="text-emerald-700">
-                  Coupon Discount: -{formatPrice(order.discountAmount)}
+                  Discount: -{formatPrice(order.discountAmount)}
                 </p>
               )}
               <p className="text-neutral-500">Shipping: {order.shippingCharge === 0 ? 'Free' : formatPrice(order.shippingCharge)}</p>
