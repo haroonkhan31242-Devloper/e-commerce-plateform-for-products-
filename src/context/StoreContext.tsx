@@ -156,7 +156,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [products, setProducts] = usePersistedState<Product[]>('aura_products', initialProducts, () =>
     showToast('error', 'Browser storage is full. Recent product changes will be lost on refresh.')
   );
-  const [categories, setCategories] = usePersistedState<Category[]>('aura_categories', initialCategories);
+  const [categories, setCategories] = usePersistedState<Category[]>('aura_categories', initialCategories, () =>
+    showToast('error', 'Browser storage is full. Recent category changes will be lost on refresh.')
+  );
   const [orders, setOrders] = usePersistedState<Order[]>('aura_orders', initialOrders);
   const [storeSettings, setStoreSettings] = usePersistedState<StoreSettings>('aura_settings', initialStoreSettings);
 

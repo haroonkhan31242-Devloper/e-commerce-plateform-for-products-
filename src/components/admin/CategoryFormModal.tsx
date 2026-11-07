@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import { Category } from '../../types/index.ts';
 import { useStore } from '../../context/StoreContext.tsx';
 import { Modal } from '../common/Overlay.tsx';
+import { CategoryImagePicker } from './CategoryImagePicker.tsx';
 
 interface CategoryFormModalProps {
   isOpen: boolean;
@@ -174,21 +175,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
             />
           </div>
 
-          <div>
-            <label htmlFor="category-form-modal-field-5" className="block font-bold text-neutral-700 uppercase tracking-wider mb-1">
-              Category Banner / Card Image URL
-            </label>
-            <input
-              id="category-form-modal-field-5"
-              type="url"
-              value={image}
-              onChange={(e) => setImage(e.target.value)}
-              className="w-full px-3 py-2 border border-neutral-300 rounded-xl"
-            />
-            {image && (
-              <img loading="lazy" decoding="async" src={image} alt="" className="mt-2 w-full h-24 object-cover rounded-xl bg-neutral-100" />
-            )}
-          </div>
+          <CategoryImagePicker image={image} onChange={setImage} />
 
           {/* Subcategories Editor */}
           <div>
