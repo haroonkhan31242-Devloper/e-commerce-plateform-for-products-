@@ -119,7 +119,7 @@ export type OrderStatus =
   | 'Rejected'
   | 'Cancelled';
 
-export type PaymentMethod = 'cod' | 'bank_transfer' | 'online_card';
+export type PaymentMethod = 'cod' | 'bank_transfer';
 
 export type PaymentStatus = 'Pending' | 'Paid' | 'Failed' | 'Refunded' | 'Awaiting Verification';
 

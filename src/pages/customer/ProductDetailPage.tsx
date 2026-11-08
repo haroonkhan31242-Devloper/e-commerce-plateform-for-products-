@@ -345,7 +345,7 @@ export const ProductDetailPage: React.FC = () => {
             </div>
             <div className="flex items-center gap-2.5">
               <Lock className="w-4 h-4 text-amber-700 shrink-0" />
-              <span>Bank transfer, cash on delivery, or card</span>
+              <span>Bank transfer or cash on delivery</span>
             </div>
           </div>
         </div>

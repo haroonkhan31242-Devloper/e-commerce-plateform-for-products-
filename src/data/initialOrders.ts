@@ -115,14 +115,15 @@ export const initialOrders: Order[] = [
     discountAmount: 0,
     shippingCharge: 0,
     grandTotal: 179310,
-    paymentMethod: 'online_card',
+    paymentMethod: 'bank_transfer',
     paymentStatus: 'Paid',
     orderStatus: 'Processing',
+    bankTransferReference: 'BT-3302187',
     timeline: [
       {
         status: 'Pending Confirmation',
         timestamp: '2026-11-03T09:15:00.000Z',
-        note: 'Order placed and online card authorization approved.',
+        note: 'Order placed and bank transfer verified.',
         actor: 'customer',
       },
       {
@@ -187,9 +188,10 @@ export const initialOrders: Order[] = [
     discountAmount: 2780,
     shippingCharge: 4170,
     grandTotal: 64768,
-    paymentMethod: 'online_card',
+    paymentMethod: 'bank_transfer',
     paymentStatus: 'Paid',
     orderStatus: 'Shipped',
+    bankTransferReference: 'BT-3301654',
     trackingNumber: 'TCS-994827103',
     courierName: 'TCS Overnight',
     timeline: [

@@ -90,7 +90,7 @@ export const Footer: React.FC = () => {
             <div>
               <h4 className="text-white font-semibold text-sm">Flexible Payments</h4>
               <p className="text-xs text-neutral-400 mt-1">
-                Pay by cash on delivery, bank transfer, or card.
+                Pay by cash on delivery or bank transfer.
               </p>
             </div>
           </div>
@@ -238,9 +238,6 @@ export const Footer: React.FC = () => {
           </span>
           <span className="px-2 py-0.5 bg-neutral-900 rounded border border-neutral-800 text-xs text-neutral-300">
             Bank Transfer
-          </span>
-          <span className="px-2 py-0.5 bg-neutral-900 rounded border border-neutral-800 text-xs text-neutral-300">
-            Card
           </span>
         </div>
       </div>

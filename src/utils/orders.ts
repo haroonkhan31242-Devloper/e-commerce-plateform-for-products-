@@ -10,7 +10,6 @@ import {
 export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   bank_transfer: 'Bank Transfer',
   cod: 'Cash on Delivery',
-  online_card: 'Card',
 };
 
 export const FINAL_ORDER_STATUSES: OrderStatus[] = ['Delivered', 'Rejected', 'Cancelled'];

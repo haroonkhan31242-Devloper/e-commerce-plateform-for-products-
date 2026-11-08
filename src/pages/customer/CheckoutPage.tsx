@@ -5,7 +5,6 @@ import {
   ArrowRight,
   ArrowLeft,
   Truck,
-  CreditCard,
   Building2,
   DollarSign,
   Lock,
@@ -18,9 +17,6 @@ import { PaymentMethod, DeliveryInfo, CustomerInfo } from '../../types/index.ts'
 import { submitOrder } from '../../services/storeApi.ts';
 import { getAvailableStock } from '../../utils/product.ts';
 import {
-  isValidCardCvc,
-  isValidCardExpiry,
-  isValidCardNumber,
   isValidEmail,
   isValidPhone,
 } from '../../utils/validation.ts';
@@ -69,9 +65,6 @@ export const CheckoutPage: React.FC = () => {
   // Step 4: Payment Method
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('bank_transfer');
   const [bankWireReference, setBankWireReference] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardExpiry, setCardExpiry] = useState('');
-  const [cardCvc, setCardCvc] = useState('');
 
   const [isPlacing, setIsPlacing] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -120,16 +113,6 @@ export const CheckoutPage: React.FC = () => {
     return showErrors(errs);
   };
 
-  const validatePayment = () => {
-    const errs: Record<string, string> = {};
-    if (paymentMethod === 'online_card') {
-      if (!isValidCardNumber(cardNumber)) errs.cardNumber = 'Enter a card number of 13 to 19 digits.';
-      if (!isValidCardExpiry(cardExpiry)) errs.cardExpiry = 'Enter a future expiry date as MM/YY.';
-      if (!isValidCardCvc(cardCvc)) errs.cardCvc = 'Enter the 3 or 4 digit security code.';
-    }
-    return showErrors(errs);
-  };
-
   const handleNext = () => {
     if (currentStep === 1 && validateStep1()) {
       setCurrentStep(2);
@@ -144,7 +127,7 @@ export const CheckoutPage: React.FC = () => {
   };
 
   const handleFinalOrderSubmit = async () => {
-    if (!validatePayment()) return;
+    setErrors({});
 
     const unavailableItem = cart.find(
       (item) => item.quantity > getAvailableStock(item.product, item.selectedVariations)
@@ -197,7 +180,7 @@ export const CheckoutPage: React.FC = () => {
         shippingCharge: effectiveShipping,
         grandTotal: finalGrandTotal,
         paymentMethod,
-        paymentStatus: paymentMethod === 'online_card' ? 'Paid' : bankReference ? 'Awaiting Verification' : 'Pending',
+        paymentStatus: bankReference ? 'Awaiting Verification' : 'Pending',
         bankTransferReference: bankReference,
       });
     } catch (error) {
@@ -663,87 +646,6 @@ export const CheckoutPage: React.FC = () => {
                       {paymentMethod === 'cod' && <span className="w-full h-full bg-neutral-900 rounded-full" />}
                     </span>
                   </div>
-                </div>
-
-                {/* 3. Online Card Simulation */}
-                <div
-                  {...selectable(paymentMethod === 'online_card', () => setPaymentMethod('online_card'))}
-                  className={`p-4 rounded-2xl border cursor-pointer transition-all ${
-                    paymentMethod === 'online_card'
-                      ? 'border-neutral-900 bg-neutral-50 shadow-xs'
-                      : 'border-neutral-200 hover:border-neutral-300'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2.5">
-                      <CreditCard className="w-5 h-5 text-indigo-700" />
-                      <div>
-                        <h4 className="font-bold text-xs text-neutral-900">Online Card Payment</h4>
-                        <p className="text-xs text-neutral-500">Demo only. No real payment is taken.</p>
-                      </div>
-                    </div>
-                    <span className="w-4 h-4 rounded-full border-2 border-neutral-900 flex items-center justify-center p-0.5">
-                      {paymentMethod === 'online_card' && <span className="w-full h-full bg-neutral-900 rounded-full" />}
-                    </span>
-                  </div>
-
-                  {paymentMethod === 'online_card' && (
-                    <div className="mt-3 pt-3 border-t border-neutral-200 space-y-3 text-xs bg-white p-4 rounded-xl border">
-                      <div>
-                        <label htmlFor="checkout-page-field-10" className="block text-xs font-semibold text-neutral-600 mb-1">
-                          Card Number
-                        </label>
-                        <input
-                          id="checkout-page-field-10"
-                          type="text"
-                          inputMode="numeric"
-                          autoComplete="off"
-                          placeholder="1234 5678 9012 3456"
-                          value={cardNumber}
-                          aria-invalid={!!errors.cardNumber}
-                          onChange={(e) => setCardNumber(e.target.value)}
-                          className="w-full px-3 py-2.5 text-xs border border-neutral-300 rounded-xl font-mono"
-                        />
-                        {errors.cardNumber && <p role="alert" className="text-xs text-rose-700 mt-1">{errors.cardNumber}</p>}
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label htmlFor="checkout-page-field-11" className="block text-xs font-semibold text-neutral-600 mb-1">
-                            Expiry
-                          </label>
-                          <input
-                            id="checkout-page-field-11"
-                            type="text"
-                            inputMode="numeric"
-                            autoComplete="off"
-                            placeholder="MM/YY"
-                            value={cardExpiry}
-                            aria-invalid={!!errors.cardExpiry}
-                            onChange={(e) => setCardExpiry(e.target.value)}
-                            className="w-full px-3 py-2.5 text-xs border border-neutral-300 rounded-xl font-mono"
-                          />
-                          {errors.cardExpiry && <p role="alert" className="text-xs text-rose-700 mt-1">{errors.cardExpiry}</p>}
-                        </div>
-                        <div>
-                          <label htmlFor="checkout-page-field-12" className="block text-xs font-semibold text-neutral-600 mb-1">
-                            CVV
-                          </label>
-                          <input
-                            id="checkout-page-field-12"
-                            type="password"
-                            inputMode="numeric"
-                            autoComplete="off"
-                            placeholder="123"
-                            value={cardCvc}
-                            aria-invalid={!!errors.cardCvc}
-                            onChange={(e) => setCardCvc(e.target.value)}
-                            className="w-full px-3 py-2.5 text-xs border border-neutral-300 rounded-xl font-mono"
-                          />
-                          {errors.cardCvc && <p role="alert" className="text-xs text-rose-700 mt-1">{errors.cardCvc}</p>}
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
 

@@ -366,9 +366,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           timestamp: new Date().toISOString(),
           note: payload.paymentMethod === 'bank_transfer'
             ? `Order registered with Wire Reference: ${payload.bankTransferReference || 'Pending Submission'}. Awaiting Admin Review.`
-            : payload.paymentMethod === 'cod'
-            ? 'Order placed under Cash on Delivery (COD). Awaiting Admin Confirmation.'
-            : 'Order placed with online payment authorization. Awaiting Admin Review.',
+            : 'Order placed under Cash on Delivery (COD). Awaiting Admin Confirmation.',
           actor: 'customer',
         },
       ],
