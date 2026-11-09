@@ -20,14 +20,3 @@ export const initialCustomerProfile: CustomerProfile = {
   totalSpent: 233520,
   createdAt: '2026-03-15',
 };
-
-export const createDemoCustomerProfile = (email: string, name?: string): CustomerProfile => ({
-  id: `cust-${Date.now()}`,
-  name: name || email.split('@')[0],
-  email,
-  phone: '',
-  savedAddresses: [],
-  totalOrders: 0,
-  totalSpent: 0,
-  createdAt: new Date().toISOString().split('T')[0],
-});

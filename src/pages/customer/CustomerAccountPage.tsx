@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { User, ShoppingBag, MapPin, LogOut, ArrowRight, Trash2, Plus } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ShoppingBag, MapPin, LogOut, ArrowRight, Trash2, Plus } from 'lucide-react';
 import { STORE_COUNTRY } from '../../data/storeSettings.ts';
 import { useStore } from '../../context/StoreContext.tsx';
 import { StatusBadge } from '../../components/common/StatusBadge.tsx';
 import { EmptyState } from '../../components/common/EmptyState.tsx';
 import { DeliveryInfo } from '../../types/index.ts';
 import { isRevenueOrder, PAYMENT_METHOD_LABELS } from '../../utils/orders.ts';
-import { isValidEmail, isValidPhone } from '../../utils/validation.ts';
+import { isValidPhone } from '../../utils/validation.ts';
+import { CustomerAuthPage, CustomerAuthMode } from './CustomerAuthPage.tsx';
 
 type AccountTab = 'orders' | 'profile' | 'addresses';
 
@@ -19,7 +20,6 @@ const EMPTY_ADDRESS = { country: STORE_COUNTRY, city: '', address: '', postalCod
 export const CustomerAccountPage: React.FC = () => {
   const {
     customerUser,
-    customerLogin,
     customerLogout,
     updateCustomerProfile,
     orders,
@@ -29,9 +29,7 @@ export const CustomerAccountPage: React.FC = () => {
     showToast,
   } = useStore();
 
-  const [emailInput, setEmailInput] = useState('');
-  const [nameInput, setNameInput] = useState('');
-  const [emailError, setEmailError] = useState<string | null>(null);
+  const [authMode, setAuthMode] = useState<CustomerAuthMode>('login');
   const [activeTab, setActiveTab] = useState<AccountTab>('orders');
 
   const [profileName, setProfileName] = useState(customerUser?.name ?? '');
@@ -42,101 +40,17 @@ export const CustomerAccountPage: React.FC = () => {
   const [newAddress, setNewAddress] = useState(EMPTY_ADDRESS);
   const [addressError, setAddressError] = useState<string | null>(null);
 
-  const handleEmailSignIn = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isValidEmail(emailInput)) {
-      setEmailError('Enter a valid email address, for example name@example.com.');
-      return;
-    }
-    customerLogin(emailInput.trim(), nameInput.trim() || undefined);
-    setProfileName(nameInput.trim() || emailInput.split('@')[0]);
-    setProfilePhone('');
-    setEmailInput('');
-    setNameInput('');
-    setEmailError(null);
-  };
+  // A customer who signs in on this page sees their own details in the forms
+  useEffect(() => {
+    setProfileName(customerUser?.name ?? '');
+    setProfilePhone(customerUser?.phone ?? '');
+    setProfileErrors({});
+    // Only a different account needs a reset; edits to the same profile keep the form as typed
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [customerUser?.id]);
 
   if (!customerUser) {
-    return (
-      <div className="max-w-md mx-auto px-4 py-12 sm:py-16">
-        <div className="bg-white rounded-3xl border border-neutral-200 p-6 sm:p-8 space-y-6">
-          <div className="text-center space-y-3">
-            <div className="w-14 h-14 rounded-full bg-amber-50 text-amber-800 mx-auto flex items-center justify-center border border-amber-200">
-              <User className="w-7 h-7" aria-hidden="true" />
-            </div>
-            <div>
-              <h1 className="font-serif text-2xl font-bold text-neutral-900">Sign in to STEROSE</h1>
-              <p className="text-sm text-neutral-600 mt-1">Manage orders, track deliveries, and save addresses.</p>
-            </div>
-          </div>
-
-          <form onSubmit={handleEmailSignIn} noValidate className="space-y-3">
-            <div>
-              <label htmlFor="signin-name" className={labelClasses}>
-                Full name
-              </label>
-              <input
-                id="signin-name"
-                type="text"
-                autoComplete="name"
-                value={nameInput}
-                onChange={(e) => setNameInput(e.target.value)}
-                className={inputClasses}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="signin-email" className={labelClasses}>
-                Email address *
-              </label>
-              <input
-                id="signin-email"
-                type="email"
-                autoComplete="email"
-                value={emailInput}
-                aria-invalid={!!emailError}
-                aria-describedby={emailError ? 'signin-email-error' : undefined}
-                onChange={(e) => setEmailInput(e.target.value)}
-                className={inputClasses}
-              />
-              {emailError && (
-                <p id="signin-email-error" role="alert" className="text-xs text-rose-700 mt-1">
-                  {emailError}
-                </p>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-3 bg-neutral-900 text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-neutral-800"
-            >
-              Sign In
-            </button>
-          </form>
-
-          <div className="relative flex items-center justify-center">
-            <span className="border-t border-neutral-200 w-full" />
-            <span className="bg-white px-3 text-xs text-neutral-500 uppercase font-semibold shrink-0">Or</span>
-            <span className="border-t border-neutral-200 w-full" />
-          </div>
-
-          <div className="space-y-1.5">
-            <button
-              type="button"
-              disabled
-              className="w-full py-3 px-4 border border-neutral-200 rounded-xl text-xs font-semibold text-neutral-500 bg-neutral-50"
-            >
-              Continue with Google
-            </button>
-            <p className="text-xs text-neutral-500 text-center">Google sign-in is coming soon.</p>
-          </div>
-
-          <p className="text-xs text-neutral-500 text-center">
-            This is a demo account stored only in your browser. No password is needed.
-          </p>
-        </div>
-      </div>
-    );
+    return <CustomerAuthPage mode={authMode} embedded onModeChange={setAuthMode} />;
   }
 
   const customerOrders = orders.filter((o) => o.customer.email.toLowerCase() === customerUser.email.toLowerCase());

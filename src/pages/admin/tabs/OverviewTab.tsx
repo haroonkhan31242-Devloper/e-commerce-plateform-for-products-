@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertTriangle, ArrowUpRight, Clock, ShoppingBag, TrendingUp } from 'lucide-react';
 import { useStore } from '../../../context/StoreContext.tsx';
+import { useAdminAuth } from '../../../context/AdminAuthContext.tsx';
 import { StatusBadge } from '../../../components/common/StatusBadge.tsx';
 import { OrderRowActions } from '../../../components/admin/OrderRowActions.tsx';
 import { Order } from '../../../types/index.ts';
@@ -15,6 +16,8 @@ interface OverviewTabProps {
 
 export const OverviewTab: React.FC<OverviewTabProps> = ({ onInspectOrder }) => {
   const { orders, products, categories, setAdminTab, formatPrice } = useStore();
+  // Order actions belong to the Orders section; Dashboard-only staff see the figures only
+  const canManageOrders = useAdminAuth().canAccess('orders');
 
   const totalRevenue = orders.filter(isRevenueOrder).reduce((sum, ord) => sum + ord.grandTotal, 0);
   const dailyRevenue = getDailyRevenue(orders);
@@ -140,6 +143,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onInspectOrder }) => {
               Open an order to verify payment or update its status.
             </p>
           </div>
+          {canManageOrders && (
           <button
             onClick={() => setAdminTab('orders')}
             className="py-1.5 text-xs font-bold text-amber-900 hover:underline flex items-center gap-1"
@@ -147,6 +151,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onInspectOrder }) => {
             <span>View All Orders</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
           </button>
+          )}
         </div>
 
         <div className="overflow-x-auto">
@@ -158,7 +163,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onInspectOrder }) => {
                 <th className="py-2.5">Total</th>
                 <th className="py-2.5">Payment</th>
                 <th className="py-2.5">Status</th>
-                <th className="py-2.5 text-right">Actions</th>
+                {canManageOrders && <th className="py-2.5 text-right">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100">
@@ -199,11 +204,13 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onInspectOrder }) => {
                       <StatusBadge status={ord.orderStatus} size="sm" />
                     </div>
                   </td>
+                  {canManageOrders && (
                   <td data-label="" className="py-3 text-right">
                     <div className="md:-mt-1.5">
                       <OrderRowActions order={ord} onInspectOrder={onInspectOrder} />
                     </div>
                   </td>
+                  )}
                 </tr>
               ))}
             </tbody>

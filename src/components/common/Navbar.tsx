@@ -212,12 +212,22 @@ export const Navbar: React.FC = () => {
                   </div>
 
                   <button
-                    onClick={closeMenusAnd(() => setCurrentView('account'))}
+                    onClick={closeMenusAnd(() => setCurrentView(customerUser ? 'account' : 'login'))}
                     className="w-full text-left px-4 py-2.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 flex items-center justify-between"
                   >
                     <span>{customerUser ? 'My Account & Orders' : 'Sign In'}</span>
                     <ArrowRight className="w-3.5 h-3.5 text-neutral-500" aria-hidden="true" />
                   </button>
+
+                  {!customerUser && (
+                    <button
+                      onClick={closeMenusAnd(() => setCurrentView('signup'))}
+                      className="w-full text-left px-4 py-2.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 flex items-center justify-between"
+                    >
+                      <span>Create Account</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-neutral-500" aria-hidden="true" />
+                    </button>
+                  )}
 
                   <button
                     onClick={closeMenusAnd(() => setCurrentView('order-tracking'))}
@@ -316,10 +326,10 @@ export const Navbar: React.FC = () => {
               Track an Order
             </button>
             <button
-              onClick={closeMenusAnd(() => setCurrentView('account'))}
+              onClick={closeMenusAnd(() => setCurrentView(customerUser ? 'account' : 'login'))}
               className="w-full text-left px-3 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-100 rounded-lg"
             >
-              My Account
+              {customerUser ? 'My Account' : 'Sign In / Create Account'}
             </button>
             <button
               onClick={closeMenusAnd(() => setCurrentView('admin'))}

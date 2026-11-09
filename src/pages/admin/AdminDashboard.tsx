@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Menu, Plus } from 'lucide-react';
 import { useStore } from '../../context/StoreContext.tsx';
+import { useAdminAuth } from '../../context/AdminAuthContext.tsx';
+import { ADMIN_TAB_LABELS } from '../../utils/permissions.ts';
 import { BrandLogo } from '../../components/common/BrandLogo.tsx';
 import { AdminSidebar } from '../../components/admin/AdminSidebar.tsx';
 import { ProductFormModal } from '../../components/admin/ProductFormModal.tsx';
@@ -20,18 +22,19 @@ import { PaymentsTab } from './tabs/PaymentsTab.tsx';
 import { ReviewsTab } from './tabs/ReviewsTab.tsx';
 import { ShippingTab } from './tabs/ShippingTab.tsx';
 import { SettingsTab } from './tabs/SettingsTab.tsx';
+import { StaffTab } from './tabs/StaffTab.tsx';
 
 export const AdminDashboard: React.FC = () => {
   const {
     adminTab,
     setAdminTab,
-    isAdminAuthenticated,
     orders,
     storeSettings,
     scannedParcelId,
     setScannedParcelId,
     showToast,
   } = useStore();
+  const { isAdminAuthenticated, isMainAdmin, canAccess, accessibleTabs } = useAdminAuth();
 
   // Mobile sidebar state
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -55,16 +58,28 @@ export const AdminDashboard: React.FC = () => {
   const [productSearchQuery, setProductSearchQuery] = useState('');
   const [settingsForm, setSettingsForm] = useState(storeSettings);
 
-  // A scanned parcel QR code opens its order once the admin is signed in
+  // A section the current account may not open (a typed URL, a stale link, a permission
+  // removed while signed in) falls back to the first section it can open
+  const isTabAllowed = canAccess(adminTab);
+  const fallbackTab = accessibleTabs[0];
   useEffect(() => {
-    if (!isAdminAuthenticated || !scannedParcelId) return;
+    if (!isAdminAuthenticated || isTabAllowed || !fallbackTab) return;
+    // Landing on the default tab after sign-in is not worth a warning
+    if (adminTab !== 'overview') showToast('warning', 'You don’t have access to that section.');
+    setAdminTab(fallbackTab);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAdminAuthenticated, isTabAllowed, fallbackTab, adminTab]);
+
+  // A scanned parcel QR code opens its order once someone allowed to manage orders signs in
+  useEffect(() => {
+    if (!isAdminAuthenticated || !scannedParcelId || !canAccess('orders')) return;
     const scannedOrder = orders.find((o) => o.parcelLabel?.parcelId === scannedParcelId);
     if (scannedOrder) setOrderIdToInspect(scannedOrder.id);
     else showToast('error', `No order was found for parcel ${scannedParcelId}.`);
     setScannedParcelId(null);
     // The setters are recreated with the store but always write to the same state
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAdminAuthenticated, scannedParcelId]);
+  }, [isAdminAuthenticated, scannedParcelId, canAccess]);
 
   if (!isAdminAuthenticated) {
     return <AdminLoginScreen />;
@@ -113,8 +128,8 @@ export const AdminDashboard: React.FC = () => {
             </button>
             <BrandLogo className="h-9 lg:hidden" />
             <div>
-              <h1 className="font-serif text-lg sm:text-xl font-bold text-neutral-900 capitalize">
-                {adminTab.replace('-', ' ')}
+              <h1 className="font-serif text-lg sm:text-xl font-bold text-neutral-900">
+                {isTabAllowed ? ADMIN_TAB_LABELS[adminTab] : ''}
               </h1>
               <p className="text-xs text-neutral-500 hidden sm:block">
                 STEROSE store management
@@ -123,7 +138,8 @@ export const AdminDashboard: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Quick Add Product Button */}
+            {/* Quick Add Product Button, for accounts that manage products */}
+            {(canAccess('products') || canAccess('inventory')) && (
             <button
               onClick={() => openProductModal(null)}
               className="px-3.5 py-1.5 bg-amber-400 hover:bg-amber-300 text-neutral-950 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors shadow-xs"
@@ -132,10 +148,12 @@ export const AdminDashboard: React.FC = () => {
               <span className="hidden sm:inline">Add Product</span>
               <span className="sm:hidden">Add</span>
             </button>
+            )}
           </div>
         </header>
 
         {/* Dynamic Tab Body */}
+        {isTabAllowed && (
         <main key={adminTab} className="p-3 sm:p-8 space-y-8 flex-1 animate-in fade-in slide-in-from-bottom-2">
           {adminTab === 'overview' && <OverviewTab onInspectOrder={inspectOrder} />}
           {adminTab === 'orders' && (
@@ -166,7 +184,9 @@ export const AdminDashboard: React.FC = () => {
           {adminTab === 'settings' && (
             <SettingsTab settingsForm={settingsForm} setSettingsForm={setSettingsForm} />
           )}
+          {adminTab === 'staff' && isMainAdmin && <StaffTab />}
         </main>
+        )}
       </div>
 
       {/* Admin Modals */}

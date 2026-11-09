@@ -7,6 +7,8 @@ export type AppView =
   | 'order-confirmation'
   | 'order-tracking'
   | 'account'
+  | 'login'
+  | 'signup'
   | 'admin';
 
 export type AdminTab =
@@ -20,7 +22,8 @@ export type AdminTab =
   | 'payments'
   | 'shipping'
   | 'reviews'
-  | 'settings';
+  | 'settings'
+  | 'staff';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -234,3 +237,45 @@ export interface CustomerProfile {
   totalSpent: number;
   createdAt: string;
 }
+
+// ---------------------------------------------------------------------------
+// Authentication (frontend prototype; see services/authService.ts)
+// ---------------------------------------------------------------------------
+
+// Admin Panel sections a staff member can be given. Staff Management is never one of them.
+export type StaffSection = Exclude<AdminTab, 'staff'>;
+
+export interface PasswordHash {
+  algorithm: 'PBKDF2-SHA256';
+  iterations: number;
+  salt: string;
+  hash: string;
+}
+
+export interface StaffAccount {
+  id: string;
+  fullName: string;
+  username: string;
+  password: PasswordHash;
+  sections: StaffSection[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  lastLoginAt?: string;
+}
+
+// Who is signed in to the Admin Panel. Customer sessions are stored separately.
+export type AdminSession = { role: 'admin' } | { role: 'staff'; staffId: string };
+
+export type AuthProvider = 'password' | 'google';
+
+export interface CustomerAccount {
+  id: string;
+  email: string;
+  provider: AuthProvider;
+  password?: PasswordHash;
+  profile: CustomerProfile;
+  createdAt: string;
+}
+
+export type AuthResult = { ok: true } | { ok: false; message: string; field?: string };

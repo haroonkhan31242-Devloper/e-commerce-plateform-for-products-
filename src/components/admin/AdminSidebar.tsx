@@ -11,10 +11,12 @@ import {
   Truck,
   MessageSquare,
   Settings,
+  UserCog,
   LogOut,
   ExternalLink,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext.tsx';
+import { useAdminAuth } from '../../context/AdminAuthContext.tsx';
 import { BrandLogo } from '../common/BrandLogo.tsx';
 import { AdminTab } from '../../types/index.ts';
 
@@ -31,7 +33,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   isOpen,
   onCloseMobile,
 }) => {
-  const { orders, products, setCurrentView, adminLogout } = useStore();
+  const { orders, products, setCurrentView } = useStore();
+  const { adminLogout, canAccess, isMainAdmin, currentStaff } = useAdminAuth();
 
   const pendingOrdersCount = orders.filter((o) => o.orderStatus === 'Pending Confirmation').length;
   const lowStockCount = products.filter((p) => p.stock <= p.lowStockThreshold).length;
@@ -60,7 +63,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     { tab: 'shipping', label: 'Shipping', icon: <Truck className="w-4 h-4" /> },
     { tab: 'reviews', label: 'Reviews', icon: <MessageSquare className="w-4 h-4" /> },
     { tab: 'settings', label: 'Settings', icon: <Settings className="w-4 h-4" /> },
+    { tab: 'staff', label: 'Staff Management', icon: <UserCog className="w-4 h-4" /> },
   ];
+  // Staff only see the sections assigned to them
+  const visibleNavItems = navItems.filter((item) => canAccess(item.tab));
 
   return (
     <>
@@ -98,7 +104,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
         {/* Navigation Menu */}
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-          {navItems.map((item) => {
+          {visibleNavItems.map((item) => {
             const isActive = activeTab === item.tab;
             return (
               <button
@@ -137,6 +143,15 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
         {/* Bottom Actions */}
         <div className="p-4 border-t border-neutral-800 space-y-2">
+          <div className="px-1 pb-1 min-w-0">
+            <p className="text-[11px] uppercase tracking-wider font-bold text-neutral-500">Signed in as</p>
+            <p className="text-xs font-semibold text-neutral-200 truncate">
+              {isMainAdmin ? 'Main Admin' : currentStaff?.fullName}
+            </p>
+            {currentStaff && (
+              <p className="text-[11px] text-neutral-500 truncate font-mono">@{currentStaff.username} · Staff</p>
+            )}
+          </div>
           <button
             onClick={() => {
               setCurrentView('home');

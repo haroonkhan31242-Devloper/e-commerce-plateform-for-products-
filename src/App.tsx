@@ -3,6 +3,7 @@ import { LazyMotion, MotionConfig } from 'motion/react';
 import { Loader2 } from 'lucide-react';
 import { StoreProvider, useStore } from './context/StoreContext.tsx';
 import { ToastProvider } from './context/ToastContext.tsx';
+import { AdminAuthProvider } from './context/AdminAuthContext.tsx';
 import { useHashRouting } from './hooks/useHashRouting.ts';
 import { Navbar } from './components/common/Navbar.tsx';
 import { Footer } from './components/common/Footer.tsx';
@@ -29,6 +30,9 @@ const OrderTrackingPage = lazy(() =>
 );
 const CustomerAccountPage = lazy(() =>
   import('./pages/customer/CustomerAccountPage.tsx').then((module) => ({ default: module.CustomerAccountPage }))
+);
+const CustomerAuthPage = lazy(() =>
+  import('./pages/customer/CustomerAuthPage.tsx').then((module) => ({ default: module.CustomerAuthPage }))
 );
 const AdminDashboard = lazy(() =>
   import('./pages/admin/AdminDashboard.tsx').then((module) => ({ default: module.AdminDashboard }))
@@ -96,6 +100,7 @@ const AppContent: React.FC = () => {
             {currentView === 'order-confirmation' && <OrderConfirmationPage />}
             {currentView === 'order-tracking' && <OrderTrackingPage />}
             {currentView === 'account' && <CustomerAccountPage />}
+            {(currentView === 'login' || currentView === 'signup') && <CustomerAuthPage mode={currentView} />}
           </Suspense>
         </div>
       </main>
@@ -116,7 +121,9 @@ export default function App() {
       <MotionConfig reducedMotion="user">
         <ToastProvider>
           <StoreProvider>
-            <AppContent />
+            <AdminAuthProvider>
+              <AppContent />
+            </AdminAuthProvider>
           </StoreProvider>
           <Toast />
         </ToastProvider>

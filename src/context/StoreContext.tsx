@@ -9,6 +9,7 @@ import {
   StoreSettings,
   CartItem,
   CartItemVariationChoice,
+  AuthResult,
   CustomerProfile,
   DeliveryInfo,
   OrderStatus,
@@ -18,7 +19,6 @@ import {
 } from '../types/index.ts';
 import { initialCategories } from '../data/initialCategories.ts';
 import { initialHeroSlides } from '../data/heroSlides.ts';
-import { createDemoCustomerProfile, initialCustomerProfile } from '../data/initialCustomers.ts';
 import { initialProducts } from '../data/initialProducts.ts';
 import { initialOrders } from '../data/initialOrders.ts';
 import { initialStoreSettings } from '../data/storeSettings.ts';
@@ -26,7 +26,13 @@ import { usePersistedState } from '../hooks/usePersistedState.ts';
 import { useToastActions } from './ToastContext.tsx';
 import { canHaveParcelLabel, createParcelLabel } from '../utils/parcelLabel.ts';
 import { formatMoney } from '../services/currencyService.ts';
-import { loginAdmin } from '../services/storeApi.ts';
+import {
+  AuthUnavailableError,
+  STORAGE_KEYS,
+  registerCustomerAccount,
+  syncCustomerProfile,
+  verifyCustomerCredentials,
+} from '../services/authService.ts';
 import { appendTimelineEvent, calculateShipping, getOrderStatusProblem } from '../utils/orders.ts';
 import {
   calculateAverageRating,
@@ -136,12 +142,10 @@ interface StoreContextType {
   moderateReview: (productId: string, reviewId: string, isApproved: boolean) => void;
   deleteReview: (productId: string, reviewId: string) => void;
 
-  // Authentication states
-  isAdminAuthenticated: boolean;
-  adminLogin: (email: string, pass: string) => Promise<boolean>;
-  adminLogout: () => void;
+  // Customer authentication (Admin Panel sign-in lives in AdminAuthContext)
   customerUser: CustomerProfile | null;
-  customerLogin: (email: string, name?: string) => void;
+  registerCustomer: (name: string, email: string, password: string) => Promise<AuthResult>;
+  customerLogin: (email: string, password: string) => Promise<AuthResult>;
   customerLogout: () => void;
   updateCustomerProfile: (updates: Partial<CustomerProfile>) => void;
 
@@ -188,12 +192,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Authentication
   const [scannedParcelId, setScannedParcelId] = useState<string | null>(null);
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
-    return localStorage.getItem('aura_admin_logged') === 'true';
-  });
   const [customerUser, setCustomerUser] = usePersistedState<CustomerProfile | null>(
-    'aura_customer',
-    initialCustomerProfile
+    STORAGE_KEYS.customerSession,
+    null
   );
 
   const [lastPlacedOrderId, setLastPlacedOrderId] = usePersistedState<string | null>('aura_last_order', null);
@@ -657,29 +658,36 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   // Auth
-  const adminLogin = async (email: string, pass: string) => {
-    const isValid = await loginAdmin(email, pass);
-    if (!isValid) {
-      showToast('error', 'Incorrect email or password.');
-      return false;
+  const authFailure = (error: unknown): AuthResult => {
+    console.error('Customer authentication failed', error);
+    return {
+      ok: false,
+      message: error instanceof AuthUnavailableError ? error.message : 'Something went wrong. Please try again.',
+    };
+  };
+
+  const registerCustomer = async (name: string, email: string, password: string): Promise<AuthResult> => {
+    try {
+      const result = await registerCustomerAccount(name, email, password);
+      if (!result.ok) return result;
+      setCustomerUser(result.profile);
+      showToast('success', `Welcome to STEROSE, ${result.profile.name.split(' ')[0]}. Your account is ready.`);
+      return { ok: true };
+    } catch (error) {
+      return authFailure(error);
     }
-    setIsAdminAuthenticated(true);
-    localStorage.setItem('aura_admin_logged', 'true');
-    showToast('success', 'Welcome back, Administrator.');
-    return true;
   };
 
-  const adminLogout = () => {
-    setIsAdminAuthenticated(false);
-    localStorage.removeItem('aura_admin_logged');
-    setCurrentView('home');
-    showToast('info', 'Admin logged out.');
-  };
-
-  const customerLogin = (email: string, name?: string) => {
-    const profile = createDemoCustomerProfile(email, name);
-    setCustomerUser(profile);
-    showToast('success', `Signed in as ${profile.name}`);
+  const customerLogin = async (email: string, password: string): Promise<AuthResult> => {
+    try {
+      const profile = await verifyCustomerCredentials(email, password);
+      if (!profile) return { ok: false, message: 'Incorrect email or password.' };
+      setCustomerUser(profile);
+      showToast('success', `Welcome back, ${profile.name.split(' ')[0]}.`);
+      return { ok: true };
+    } catch (error) {
+      return authFailure(error);
+    }
   };
 
   const customerLogout = () => {
@@ -688,7 +696,12 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const updateCustomerProfile = (updates: Partial<CustomerProfile>) => {
-    setCustomerUser((prev) => (prev ? { ...prev, ...updates } : prev));
+    setCustomerUser((prev) => {
+      if (!prev) return prev;
+      const next = { ...prev, ...updates };
+      syncCustomerProfile(next);
+      return next;
+    });
   };
 
   return (
@@ -767,10 +780,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         addProductReview,
         moderateReview,
         deleteReview,
-        isAdminAuthenticated,
-        adminLogin,
-        adminLogout,
         customerUser,
+        registerCustomer,
         customerLogin,
         customerLogout,
         updateCustomerProfile,

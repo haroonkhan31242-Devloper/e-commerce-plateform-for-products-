@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useStore } from '../context/StoreContext.tsx';
 import { AdminTab, AppView } from '../types/index.ts';
+import { ALL_ADMIN_TABS } from '../utils/permissions.ts';
 
 const STATIC_ROUTES: Record<string, AppView> = {
   cart: 'cart',
@@ -8,21 +9,12 @@ const STATIC_ROUTES: Record<string, AppView> = {
   'order-confirmation': 'order-confirmation',
   track: 'order-tracking',
   account: 'account',
+  login: 'login',
+  signup: 'signup',
 };
 
-const ADMIN_TABS: AdminTab[] = [
-  'overview',
-  'orders',
-  'products',
-  'categories',
-  'hero-slider',
-  'inventory',
-  'customers',
-  'payments',
-  'shipping',
-  'reviews',
-  'settings',
-];
+// Whether the signed-in user may open a tab is decided by the Admin Panel itself
+const ADMIN_TABS = ALL_ADMIN_TABS;
 
 const VIEW_PATHS: Partial<Record<AppView, string>> = {
   cart: 'cart',
@@ -30,6 +22,8 @@ const VIEW_PATHS: Partial<Record<AppView, string>> = {
   'order-confirmation': 'order-confirmation',
   'order-tracking': 'track',
   account: 'account',
+  login: 'login',
+  signup: 'signup',
 };
 
 // Keeps the store's view state and the URL hash in step, so the browser's back and
