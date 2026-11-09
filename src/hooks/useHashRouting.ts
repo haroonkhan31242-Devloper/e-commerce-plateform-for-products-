@@ -15,6 +15,7 @@ const ADMIN_TABS: AdminTab[] = [
   'orders',
   'products',
   'categories',
+  'hero-slider',
   'inventory',
   'customers',
   'payments',

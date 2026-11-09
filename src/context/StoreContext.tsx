@@ -4,6 +4,7 @@ import {
   AppView,
   Product,
   Category,
+  HeroSlide,
   Order,
   StoreSettings,
   CartItem,
@@ -16,6 +17,7 @@ import {
   ToastType,
 } from '../types/index.ts';
 import { initialCategories } from '../data/initialCategories.ts';
+import { initialHeroSlides } from '../data/heroSlides.ts';
 import { createDemoCustomerProfile, initialCustomerProfile } from '../data/initialCustomers.ts';
 import { initialProducts } from '../data/initialProducts.ts';
 import { initialOrders } from '../data/initialOrders.ts';
@@ -60,6 +62,7 @@ interface StoreContextType {
   // Data
   products: Product[];
   storefrontProducts: Product[];
+  heroSlides: HeroSlide[];
   categories: Category[];
   orders: Order[];
   storeSettings: StoreSettings;
@@ -122,6 +125,12 @@ interface StoreContextType {
   deleteCategory: (id: string) => boolean;
 
 
+  // Hero slider (Admin)
+  saveHeroSlide: (slide: Omit<HeroSlide, 'id'> & { id?: string }) => void;
+  deleteHeroSlide: (id: string) => void;
+  moveHeroSlide: (id: string, direction: -1 | 1) => void;
+  setHeroSlideActive: (id: string, isActive: boolean) => void;
+
   // Reviews CRUD
   addProductReview: (productId: string, review: Omit<Review, 'id' | 'date' | 'isApproved'>) => void;
   moderateReview: (productId: string, reviewId: string, isApproved: boolean) => void;
@@ -162,6 +171,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     showToast('error', 'Browser storage is full. Recent category changes will be lost on refresh.')
   );
   const [orders, setOrders] = usePersistedState<Order[]>('aura_orders', initialOrders);
+  const [heroSlides, setHeroSlides] = usePersistedState<HeroSlide[]>('aura_hero_slides', initialHeroSlides, () =>
+    showToast('error', 'Browser storage is full. Recent slider changes will be lost on refresh.')
+  );
   const [storeSettings, setStoreSettings] = usePersistedState<StoreSettings>('aura_settings', initialStoreSettings);
 
   // Cart & Wishlist
@@ -577,6 +589,38 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return true;
   };
 
+  // Hero slider
+  const saveHeroSlide = ({ id, ...slide }: Omit<HeroSlide, 'id'> & { id?: string }) => {
+    if (id && heroSlides.some((s) => s.id === id)) {
+      setHeroSlides((prev) => prev.map((s) => (s.id === id ? { ...slide, id } : s)));
+      showToast('success', 'Slide updated.');
+    } else {
+      setHeroSlides((prev) => [...prev, { ...slide, id: `hero-${Date.now()}` }]);
+      showToast('success', 'Slide added to the home page slider.');
+    }
+  };
+
+  const deleteHeroSlide = (id: string) => {
+    setHeroSlides((prev) => prev.filter((s) => s.id !== id));
+    showToast('info', 'Slide removed.');
+  };
+
+  const moveHeroSlide = (id: string, direction: -1 | 1) => {
+    setHeroSlides((prev) => {
+      const from = prev.findIndex((s) => s.id === id);
+      const to = from + direction;
+      if (from < 0 || to < 0 || to >= prev.length) return prev;
+      const next = [...prev];
+      [next[from], next[to]] = [next[to], next[from]];
+      return next;
+    });
+  };
+
+  const setHeroSlideActive = (id: string, isActive: boolean) => {
+    setHeroSlides((prev) => prev.map((s) => (s.id === id ? { ...s, isActive } : s)));
+    showToast('success', isActive ? 'Slide is now showing on the home page.' : 'Slide hidden from the home page.');
+  };
+
   // Reviews Moderation
   // Only published reviews count towards the rating shoppers see
   const withReviews = (product: Product, reviews: Review[]): Product => {
@@ -672,6 +716,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         trackOrder,
         products,
         storefrontProducts,
+        heroSlides,
+        saveHeroSlide,
+        deleteHeroSlide,
+        moveHeroSlide,
+        setHeroSlideActive,
         categories,
         orders,
         storeSettings,

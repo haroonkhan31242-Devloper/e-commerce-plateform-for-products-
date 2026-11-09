@@ -16,9 +16,16 @@ const SOURCE_TABS: { id: ImageSource; label: string; icon: React.ReactNode }[] =
 interface CategoryImagePickerProps {
   image: string;
   onChange: (image: string) => void;
+  label?: string;
+  showPreview?: boolean;
 }
 
-export const CategoryImagePicker: React.FC<CategoryImagePickerProps> = ({ image, onChange }) => {
+export const CategoryImagePicker: React.FC<CategoryImagePickerProps> = ({
+  image,
+  onChange,
+  label = 'Category Banner / Card Image',
+  showPreview = true,
+}) => {
   const [source, setSource] = useState<ImageSource>('gallery');
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -47,7 +54,7 @@ export const CategoryImagePicker: React.FC<CategoryImagePickerProps> = ({ image,
 
   return (
     <div className="space-y-2">
-      <p className="font-bold text-neutral-700 uppercase tracking-wider">Category Banner / Card Image</p>
+      <p className="font-bold text-neutral-700 uppercase tracking-wider">{label}</p>
 
       <div role="tablist" aria-label="Image source" className="grid grid-cols-2 gap-1 p-1 bg-neutral-100 rounded-xl">
         {SOURCE_TABS.map((tab) => (
@@ -125,7 +132,7 @@ export const CategoryImagePicker: React.FC<CategoryImagePickerProps> = ({ image,
         </p>
       )}
 
-      {image && (
+      {showPreview && image && (
         <img loading="lazy" decoding="async" src={image} alt="" className="w-full h-24 object-cover rounded-xl bg-neutral-100" />
       )}
     </div>

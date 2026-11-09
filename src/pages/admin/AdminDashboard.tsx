@@ -5,13 +5,15 @@ import { BrandLogo } from '../../components/common/BrandLogo.tsx';
 import { AdminSidebar } from '../../components/admin/AdminSidebar.tsx';
 import { ProductFormModal } from '../../components/admin/ProductFormModal.tsx';
 import { CategoryFormModal } from '../../components/admin/CategoryFormModal.tsx';
+import { HeroSlideFormModal } from '../../components/admin/HeroSlideFormModal.tsx';
 import { OrderDetailModal } from '../../components/admin/OrderDetailModal.tsx';
-import { Product, Category, Order } from '../../types/index.ts';
+import { Product, Category, Order, HeroSlide } from '../../types/index.ts';
 import { AdminLoginScreen } from './AdminLoginScreen.tsx';
 import { OverviewTab } from './tabs/OverviewTab.tsx';
 import { OrdersTab } from './tabs/OrdersTab.tsx';
 import { ProductsTab } from './tabs/ProductsTab.tsx';
 import { CategoriesTab } from './tabs/CategoriesTab.tsx';
+import { HeroSliderTab } from './tabs/HeroSliderTab.tsx';
 import { InventoryTab } from './tabs/InventoryTab.tsx';
 import { CustomersTab } from './tabs/CustomersTab.tsx';
 import { PaymentsTab } from './tabs/PaymentsTab.tsx';
@@ -40,6 +42,9 @@ export const AdminDashboard: React.FC = () => {
 
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [categoryToEdit, setCategoryToEdit] = useState<Category | null>(null);
+
+  const [isHeroSlideModalOpen, setIsHeroSlideModalOpen] = useState(false);
+  const [heroSlideToEdit, setHeroSlideToEdit] = useState<HeroSlide | null>(null);
 
   const [orderIdToInspect, setOrderIdToInspect] = useState<string | null>(null);
 
@@ -76,6 +81,11 @@ export const AdminDashboard: React.FC = () => {
   const openCategoryModal = (category: Category | null) => {
     setCategoryToEdit(category);
     setIsCategoryModalOpen(true);
+  };
+
+  const openHeroSlideModal = (slide: HeroSlide | null) => {
+    setHeroSlideToEdit(slide);
+    setIsHeroSlideModalOpen(true);
   };
 
   const inspectOrder = (order: Order) => setOrderIdToInspect(order.id);
@@ -145,6 +155,7 @@ export const AdminDashboard: React.FC = () => {
             />
           )}
           {adminTab === 'categories' && <CategoriesTab onEditCategory={openCategoryModal} />}
+          {adminTab === 'hero-slider' && <HeroSliderTab onEditSlide={openHeroSlideModal} />}
           {adminTab === 'inventory' && <InventoryTab onEditProduct={openProductModal} />}
           {adminTab === 'customers' && <CustomersTab />}
           {adminTab === 'payments' && <PaymentsTab onInspectOrder={inspectOrder} />}
@@ -169,6 +180,12 @@ export const AdminDashboard: React.FC = () => {
         isOpen={isCategoryModalOpen}
         onClose={() => setIsCategoryModalOpen(false)}
         categoryToEdit={categoryToEdit}
+      />
+
+      <HeroSlideFormModal
+        isOpen={isHeroSlideModalOpen}
+        onClose={() => setIsHeroSlideModalOpen(false)}
+        slideToEdit={heroSlideToEdit}
       />
 
       <OrderDetailModal

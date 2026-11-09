@@ -4,6 +4,7 @@ import {
   ShoppingBag,
   Package,
   Layers,
+  Images,
   Boxes,
   Users,
   CreditCard,
@@ -46,6 +47,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     },
     { tab: 'products', label: 'Products', icon: <Package className="w-4 h-4" /> },
     { tab: 'categories', label: 'Categories', icon: <Layers className="w-4 h-4" /> },
+    { tab: 'hero-slider', label: 'Hero Slider', icon: <Images className="w-4 h-4" /> },
     {
       tab: 'inventory',
       label: 'Inventory',

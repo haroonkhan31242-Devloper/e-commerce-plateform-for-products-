@@ -8,58 +8,44 @@ import { Reveal } from '../../components/common/Reveal.tsx';
 import { useSwipeNavigation } from '../../hooks/useSwipeNavigation.ts';
 import { sizedImage } from '../../utils/images.ts';
 
-const HERO_SLIDES = [
-  {
-    tag: "Ladies' Haute Couture",
-    title: 'Pure Mulberry Silk & Tailored Elegance',
-    subtitle: 'Exquisite evening gowns, fluid drapery, and artisanal craftsmanship designed for unforgettable presence.',
-    categorySlug: 'ladies-fashion',
-    ctaText: 'Explore Couture',
-    image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=85',
-  },
-  {
-    tag: 'Clinical Healthcare & Diagnostics',
-    title: 'Certified Medical Precision for Home Wellness',
-    subtitle: 'Hospital-grade digital blood pressure monitors, liposomal vitamins, and first-aid essentials vetted by pharmacists.',
-    categorySlug: 'healthcare',
-    ctaText: 'Shop Healthcare',
-    image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=1600&q=85',
-  },
-  {
-    tag: 'Fine Artificial Jewelry',
-    title: '18K Gold Vermeil & Brilliant 5A Zirconia',
-    subtitle: 'Hand-set emerald pendants, chandelier drops, and bridal majesty with lasting anti-tarnish luster.',
-    categorySlug: 'artificial-jewelry',
-    ctaText: 'Discover Jewels',
-    image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1600&q=85',
-  },
-  {
-    tag: 'Botanical Cosmetics & Skincare',
-    title: 'Colloidal Gold, Peptides & Velvet Pigments',
-    subtitle: 'Clean biomimetic formulations and weightless matte lipsticks that enhance your natural radiance.',
-    categorySlug: 'cosmetics',
-    ctaText: 'Shop Beauty',
-    image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1600&q=85',
-  },
-];
-
 export const HomePage: React.FC = () => {
   const {
     storefrontProducts: products,
     categories,
     navigateToCategory,
     browseAllProducts,
+    heroSlides,
+    storeSettings,
   } = useStore();
 
   const [activeSlide, setActiveSlide] = useState(0);
+  const [failedHeroImages, setFailedHeroImages] = useState<string[]>([]);
+
+  // Slides come from the admin Hero Slider section; hidden ones never reach shoppers
+  const slides = heroSlides.filter((slide) => slide.isActive && slide.image.trim());
+  const slideIndex = slides.length > 0 ? activeSlide % slides.length : 0;
+
   const heroSwipe = useSwipeNavigation<HTMLElement>((direction) =>
-    setActiveSlide((slide) => (slide + direction + HERO_SLIDES.length) % HERO_SLIDES.length)
+    setActiveSlide((slide) => (slides.length > 0 ? (slide + direction + slides.length) % slides.length : 0))
   );
 
   const bestSellers = products.filter((p) => p.isBestSeller);
   const newArrivals = products.filter((p) => p.isNewArrival);
 
-  const currentHero = HERO_SLIDES[activeSlide];
+  const storeName = storeSettings.storeName || 'STEROSE';
+  // With no slides to show, the hero keeps its frame and offers a plain welcome instead
+  const currentHero = slides[slideIndex] ?? {
+    id: 'welcome',
+    image: '',
+    tag: storeName,
+    title: `Welcome to ${storeName}`,
+    subtitle: storeSettings.storeTagline,
+    ctaText: 'Shop All Products',
+    categorySlug: '',
+  };
+  const heroImage = failedHeroImages.includes(currentHero.image) ? '' : currentHero.image;
+  const heroCategory = categories.find((c) => c.slug === currentHero.categorySlug && c.isActive);
+  const openHeroLink = () => (heroCategory ? navigateToCategory(heroCategory.slug) : browseAllProducts());
 
   return (
     <div className="space-y-14 sm:space-y-20 pb-16 sm:pb-24">
@@ -72,69 +58,83 @@ export const HomePage: React.FC = () => {
         {/* Background Image with Gradient Overlay */}
         <div className="absolute inset-0 z-0">
           <AnimatePresence initial={false}>
-            <m.img
-              key={currentHero.image}
-              src={currentHero.image}
-              srcSet={`${sizedImage(currentHero.image, 800)} 800w, ${currentHero.image} 1600w`}
-              sizes="100vw"
-              alt=""
-              fetchPriority="high"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.8 }}
-              className="absolute inset-0 w-full h-full object-cover object-center brightness-75"
-            />
+            {heroImage && (
+              <m.img
+                key={currentHero.id}
+                src={heroImage}
+                // An uploaded image is a data URL, whose commas a srcset would misread
+                srcSet={heroImage.startsWith('http') ? `${sizedImage(heroImage, 800)} 800w, ${heroImage} 1600w` : undefined}
+                sizes="100vw"
+                alt=""
+                data-no-fallback
+                onError={() => setFailedHeroImages((prev) => [...prev, heroImage])}
+                fetchPriority="high"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.8 }}
+                className="absolute inset-0 w-full h-full object-cover object-center brightness-75"
+              />
+            )}
           </AnimatePresence>
           <div className="absolute inset-0 bg-linear-to-r from-neutral-950/90 via-neutral-950/60 to-neutral-950/10" />
         </div>
 
         {/* Hero Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
-          <div key={activeSlide} className="max-w-2xl space-y-6 animate-in fade-in slide-in-from-bottom-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/20 border border-amber-500/40 text-amber-300 rounded-full text-xs font-semibold tracking-wider uppercase">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>{currentHero.tag}</span>
-            </div>
+          <div key={currentHero.id} className="max-w-2xl space-y-6 animate-in fade-in slide-in-from-bottom-2">
+            {currentHero.tag && (
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/20 border border-amber-500/40 text-amber-300 rounded-full text-xs font-semibold tracking-wider uppercase">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span>{currentHero.tag}</span>
+              </div>
+            )}
 
-            <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-tight">
-              {currentHero.title}
+            {/* The page always keeps one main heading, even for a slide without text */}
+            <h1 className={currentHero.title ? 'font-serif text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-tight' : 'sr-only'}>
+              {currentHero.title || storeName}
             </h1>
 
-            <p className="text-sm sm:text-base text-neutral-300 leading-relaxed max-w-xl font-light">
-              {currentHero.subtitle}
-            </p>
+            {currentHero.subtitle && (
+              <p className="text-sm sm:text-base text-neutral-300 leading-relaxed max-w-xl font-light">
+                {currentHero.subtitle}
+              </p>
+            )}
 
-            <div className="flex flex-wrap items-center gap-4 pt-4">
-              <button
-                onClick={() => navigateToCategory(currentHero.categorySlug)}
-                className="px-8 py-3.5 bg-white text-neutral-950 hover:bg-amber-400 hover:text-neutral-950 text-xs font-bold tracking-wider uppercase rounded-xl transition-all shadow-xl flex items-center gap-2 group"
-              >
-                <span>{currentHero.ctaText}</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
-            </div>
+            {currentHero.ctaText && (
+              <div className="flex flex-wrap items-center gap-4 pt-4">
+                <button
+                  onClick={openHeroLink}
+                  className="px-8 py-3.5 bg-white text-neutral-950 hover:bg-amber-400 hover:text-neutral-950 text-xs font-bold tracking-wider uppercase rounded-xl transition-all shadow-xl flex items-center gap-2 group"
+                >
+                  <span>{currentHero.ctaText}</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Slide Indicator Dots */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-1">
-          {HERO_SLIDES.map((slide, idx) => (
-            <button
-              key={slide.categorySlug}
-              onClick={() => setActiveSlide(idx)}
-              aria-label={`Show slide ${idx + 1}: ${slide.tag}`}
-              aria-current={activeSlide === idx}
-              className="py-3 px-1 group"
-            >
-              <span
-                className={`block h-1 rounded-full transition-all duration-300 ${
-                  activeSlide === idx ? 'w-8 bg-amber-400' : 'w-4 bg-white/40 group-hover:bg-white/70'
-                }`}
-              />
-            </button>
-          ))}
-        </div>
+        {slides.length > 1 && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-1">
+            {slides.map((slide, idx) => (
+              <button
+                key={slide.id}
+                onClick={() => setActiveSlide(idx)}
+                aria-label={`Show slide ${idx + 1}${slide.tag || slide.title ? `: ${slide.tag || slide.title}` : ''}`}
+                aria-current={slideIndex === idx}
+                className="py-3 px-1 group"
+              >
+                <span
+                  className={`block h-1 rounded-full transition-all duration-300 ${
+                    slideIndex === idx ? 'w-8 bg-amber-400' : 'w-4 bg-white/40 group-hover:bg-white/70'
+                  }`}
+                />
+              </button>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Main Product Categories Showcase */}

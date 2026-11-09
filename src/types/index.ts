@@ -14,6 +14,7 @@ export type AdminTab =
   | 'orders'
   | 'products'
   | 'categories'
+  | 'hero-slider'
   | 'inventory'
   | 'customers'
   | 'payments'
@@ -63,6 +64,18 @@ export interface Review {
   comment: string;
   verifiedPurchase: boolean;
   isApproved: boolean;
+}
+
+// One image in the home page hero slider. The array order is the display order.
+export interface HeroSlide {
+  id: string;
+  image: string; // Image link, or an uploaded image stored as a data URL
+  tag: string;
+  title: string;
+  subtitle: string;
+  ctaText: string; // Empty hides the button
+  categorySlug: string; // Empty opens All Products
+  isActive: boolean;
 }
 
 export interface Product {
